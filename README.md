@@ -1,0 +1,1 @@
+# boost-graph-timed-automata [![wercker status](https://app.wercker.com/status/a0cd4eebf0ad12cd32f5ec26d980849c/s/master "wercker status")](https://app.wercker.com/project/byKey/a0cd4eebf0ad12cd32f5ec26d980849c)
