@@ -9,23 +9,24 @@
 #include "timed_automaton.hh"
 
 
-template<class SignalVariables, class ClockVariables>
+template<class SignalVariables, class ClockVariables, class Value>
 struct BoostZoneGraphState {
   typename BoostTimedAutomaton<SignalVariables, ClockVariables>::vertex_descriptor vertex;
   bool jumpable;
   DBM zone;
+  std::vector<std::vector<Value>> valuations;
 };
 
-template<class SignalVariables, class ClockVariables, class Weight>
-using BoostZoneGraph = boost::adjacency_list<boost::listS, boost::vecS, boost::directedS, BoostZoneGraphState<SignalVariables, ClockVariables>, boost::property<boost::edge_weight_t, Weight>>;
+template<class SignalVariables, class ClockVariables, class Weight, class Value>
+using BoostZoneGraph = boost::adjacency_list<boost::listS, boost::vecS, boost::directedS, BoostZoneGraphState<SignalVariables, ClockVariables, Value>, boost::property<boost::edge_weight_t, Weight>>;
 
-template<class SignalVariables, class ClockVariables, class Weight>
+template<class SignalVariables, class ClockVariables, class Weight, class Value>
 void zoneConstruction(const BoostTimedAutomaton<SignalVariables, ClockVariables> &TA,
                       const std::vector<typename BoostTimedAutomaton<SignalVariables, ClockVariables>::vertex_descriptor> &initStatesTA,
-                      BoostZoneGraph<SignalVariables, ClockVariables, Weight> &ZG,
+                      BoostZoneGraph<SignalVariables, ClockVariables, Weight, Value> &ZG,
                       std::vector<typename BoostTimedAutomaton<SignalVariables, ClockVariables>::vertex_descriptor> &initStatesZG) {
   using TA_t = BoostTimedAutomaton<SignalVariables, ClockVariables>;
-  using ZG_t = BoostZoneGraph<SignalVariables, ClockVariables, Weight>;
+  using ZG_t = BoostZoneGraph<SignalVariables, ClockVariables, Weight, Value>;
   boost::unordered_map<std::pair<typename TA_t::vertex_descriptor, DBM::Tuple>, typename ZG_t::vertex_descriptor> toZGState;
   const auto max_constraints = boost::get_property(TA, boost::graph_max_constraints);
   const auto num_of_vars = boost::get_property(TA, boost::graph_num_of_vars);
@@ -103,6 +104,10 @@ void zoneConstruction(const BoostTimedAutomaton<SignalVariables, ClockVariables>
 
 /*!
   @brief Zone construction with an additional clock variable.
+  @tparam SignalVariables 
+  @tparam ClockVariables
+  @tparam CostFunction
+  @tparam Weight
   @param [in] TA A timed automaton.
   @param [in] initConfTA Initial configuarion of the timed automaton
   @param [in] cost A cost function.
@@ -111,25 +116,23 @@ void zoneConstruction(const BoostTimedAutomaton<SignalVariables, ClockVariables>
   @param [out] ZG The zone graph with weight.
   @param [out] initStatesZG The initial states of the zone graph.
  */
-template<class SignalVariables, class ClockVariables, class CostFunction, class Weight>
+template<class SignalVariables, class ClockVariables, class Weight, class Value>
 void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVariables> &TA,
-                           const std::vector<BoostZoneGraphState<SignalVariables, ClockVariables>> &initConfTA,
-                           const CostFunction &cost,
-                           const std::vector<SignalVariables> &valuation,
+                           const std::vector<BoostZoneGraphState<SignalVariables, ClockVariables, Value>> &initConfTA,
+                           const std::function<Weight(const std::vector<Constraint<ClockVariables>> &,const std::vector<std::vector<Value>> &)> cost,
+                           const std::vector<Value> &valuation,
                            const double duration,
-                           BoostZoneGraph<SignalVariables, ClockVariables, Weight> &ZG,
+                           BoostZoneGraph<SignalVariables, ClockVariables, Weight, Value> &ZG,
                            std::vector<typename BoostTimedAutomaton<SignalVariables, ClockVariables>::vertex_descriptor> &initStatesZG) {
   using TA_t = BoostTimedAutomaton<SignalVariables, ClockVariables>;
-  using ZG_t = BoostZoneGraph<SignalVariables, ClockVariables, Weight>;
-  boost::unordered_map<std::pair<typename TA_t::vertex_descriptor, DBM::Tuple>, typename ZG_t::vertex_descriptor> toZGState;
+  using ZG_t = BoostZoneGraph<SignalVariables, ClockVariables, Weight, Value>;
+  boost::unordered_map<std::tuple<typename TA_t::vertex_descriptor, bool, DBM::Tuple, std::vector<std::vector<Value>>>, typename ZG_t::vertex_descriptor> toZGState;
   const auto max_constraints = std::max<double>(ceil(duration), boost::get_property(TA, boost::graph_max_constraints));
   const auto num_of_vars = boost::get_property(TA, boost::graph_num_of_vars);
-  // auto zeroDBM = DBM::zero(num_of_vars + 1);
-  // zeroDBM.M = max_constraints;
 
-  const auto convToKey = [] (BoostZoneGraphState<SignalVariables, ClockVariables> x) {
-    return std::make_tuple(x.vertex, x.jumpable, x.zone.toTuple());
-  };
+  const auto convToKey = [] (BoostZoneGraphState<SignalVariables, ClockVariables, Value> x) {
+                           return std::make_tuple(x.vertex, x.jumpable, x.zone.toTuple(), x.valuations);
+                         };
 
   initStatesZG.reserve(initConfTA.size());
   for (const auto &initState: initConfTA) {
@@ -137,6 +140,7 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
     ZG[v].vertex = initState.vertex;
     ZG[v].jumpable = initState.jumpable;
     ZG[v].zone = initState.zone;    
+    ZG[v].valuations = initState.valuations;
     // the zone must contain the new clock variable T for the dwell time.
     // we admit > ... + 1 to use this function for timed pattern matching too.
     assert(ZG[v].zone.getNumOfVar() >= num_of_vars + 1);
@@ -150,23 +154,31 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
   }
   auto nextConf = initStatesZG;
 
-  const auto addEdge = [&toZGState,&ZG,&nextConf] (const auto currentZGState, const auto nextTAState, const bool jumpable, const DBM &zone) {
-    auto zgState = toZGState.find(std::make_tuple(nextTAState, jumpable, zone.toTuple()));
+  const auto addEdge = [&toZGState,&ZG,&nextConf,&TA,&cost] (const auto currentZGState, const auto nextTAState, const bool jumpable, const DBM &zone, const std::vector<std::vector<Value>> valuations) {
+    auto zgState = toZGState.find(std::make_tuple(nextTAState, jumpable, zone.toTuple(), valuations));
+    typename ZG_t::edge_descriptor edge;
 
     if (zgState != toZGState.end()) {
       // targetStateInZA is already added
-      boost::add_edge(currentZGState, zgState->second, ZG);
-
+      edge = std::get<0>(boost::add_edge(currentZGState, zgState->second, ZG));
     } else {
       // targetStateInZA is new
       auto nextZGState = boost::add_vertex(ZG);
       ZG[nextZGState].vertex = nextTAState;
       ZG[nextZGState].jumpable = jumpable;
       ZG[nextZGState].zone = zone;
-      toZGState[std::make_tuple(nextTAState, jumpable, zone.toTuple())] = nextZGState;
-      boost::add_edge(currentZGState, nextZGState, ZG);
+      ZG[nextZGState].valuations = valuations;
+      toZGState[std::make_tuple(nextTAState, jumpable, zone.toTuple(), valuations)] = nextZGState;
+      edge = std::get<0>(boost::add_edge(currentZGState, nextZGState, ZG));
 
       nextConf.push_back (nextZGState);
+    }
+
+    if (jumpable) {
+      boost::put(boost::edge_weight_t(), ZG, edge, cost(TA[ZG[currentZGState].vertex].label,
+                                                        ZG[currentZGState].valuations));
+    } else {
+      boost::put(boost::edge_weight_t(), ZG, edge, Weight::one());
     }
   };
 
@@ -208,13 +220,15 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
             nextZone.abstractize();
             nextZone.canonize();
 
-            addEdge(currentZGState, nextTAState, false, nextZone);
+            addEdge(currentZGState, nextTAState, false, nextZone, {});
           }
         }        
       } else {
         // continuous transition
+        auto nextValuations = ZG[currentZGState].valuations;
+        nextValuations.push_back(valuation);
         nowZone.elapse();
-        addEdge(currentZGState, ZG[currentZGState].vertex, true, nowZone);
+        addEdge(currentZGState, ZG[currentZGState].vertex, true, nowZone, nextValuations);
       }
     }
   }
