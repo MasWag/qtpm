@@ -5,7 +5,7 @@
 #include "timed_automaton.hh"
 
 template<class Weight, class Value, class ClockVariables>
-Weight spaceRobustness(const std::vector<Constraint<ClockVariables>> &label, const std::vector<Value> valuation) {
+Weight singleSpaceRobustness(const std::vector<Constraint<ClockVariables>> &label, const std::vector<Value> &valuation) {
   return std::accumulate(label.begin(), label.end(), Weight::one(), [&valuation] (Weight init, Constraint<ClockVariables> constraint) {
       Weight w = Weight::zero();
       switch (constraint.odr) {
@@ -19,5 +19,12 @@ Weight spaceRobustness(const std::vector<Constraint<ClockVariables>> &label, con
         break;
       }
       return init * w;
+    });
+}
+
+template<class Weight, class Value, class ClockVariables>
+Weight multipleSpaceRobustness(const std::vector<Constraint<ClockVariables>> &label, const std::vector<std::vector<Value>> &valuations) {
+  return std::accumulate(valuations.begin(), valuations.end(), Weight::one(), [&label](Weight init, const std::vector<Value> &valuation) {
+      return init * singleSpaceRobustness<Weight>(label, valuation);
     });
 }
