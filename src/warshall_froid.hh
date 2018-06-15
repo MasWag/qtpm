@@ -2,6 +2,11 @@
 
 #include "weighted_graph.hh"
 
+/*!
+  @brief Semiring-based (all source) shortest path problem
+  @param [in] G A weighted automaton.
+  @param [out] distance The shortest cost from the initial cost.
+ */
 template<typename WeightedGraph>
 void warshall_froid(const WeightedGraph &G, 
                     std::unordered_map<typename WeightedGraph::vertex_descriptor, 
