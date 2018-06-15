@@ -37,7 +37,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( bellmanFordTest0, T, testTypesInt )
   add_edge(vs[2], vs[3], T(2), G);
   add_edge(vs[3], vs[1], T(-1), G);
 
-  bellman_ford<std::queue<typename Graph::vertex_descriptor>>(G, vs[1], distance);
+  std::unordered_map<typename Graph::vertex_descriptor, typename Graph::edge_property_type::value_type> init;
+  init[vs[1]] = T::one();
+  
+  bellman_ford<std::queue<typename Graph::vertex_descriptor>>(G, init, distance);
 
   constexpr int const ans = ans_trait<T>::ans;
 
