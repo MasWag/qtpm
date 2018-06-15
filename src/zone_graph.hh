@@ -101,15 +101,28 @@ void zoneConstruction(const BoostTimedAutomaton<SignalVariables, ClockVariables>
 }
 
 
-template<class SignalVariables, class ClockVariables, class Weight>
+/*!
+  @brief Zone construction with an additional clock variable.
+  @param [in] TA A timed automaton.
+  @param [in] initConfTA Initial configuarion of the timed automaton
+  @param [in] cost A cost function.
+  @param [in] valuation A data valuation
+  @param [in] duartion A length of the signal
+  @param [out] ZG The zone graph with weight.
+  @param [out] initStatesZG The initial states of the zone graph.
+ */
+template<class SignalVariables, class ClockVariables, class CostFunction, class Weight>
 void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVariables> &TA,
                            const std::vector<BoostZoneGraphState<SignalVariables, ClockVariables>> &initConfTA,
+                           const CostFunction &cost,
+                           const std::vector<SignalVariables> &valuation,
+                           const double duration,
                            BoostZoneGraph<SignalVariables, ClockVariables, Weight> &ZG,
                            std::vector<typename BoostTimedAutomaton<SignalVariables, ClockVariables>::vertex_descriptor> &initStatesZG) {
   using TA_t = BoostTimedAutomaton<SignalVariables, ClockVariables>;
   using ZG_t = BoostZoneGraph<SignalVariables, ClockVariables, Weight>;
   boost::unordered_map<std::pair<typename TA_t::vertex_descriptor, DBM::Tuple>, typename ZG_t::vertex_descriptor> toZGState;
-  const auto max_constraints = boost::get_property(TA, boost::graph_max_constraints);
+  const auto max_constraints = std::max<double>(ceil(duration), boost::get_property(TA, boost::graph_max_constraints));
   const auto num_of_vars = boost::get_property(TA, boost::graph_num_of_vars);
   // auto zeroDBM = DBM::zero(num_of_vars + 1);
   // zeroDBM.M = max_constraints;
@@ -123,10 +136,11 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
     auto v = boost::add_vertex(ZG);
     ZG[v].vertex = initState.vertex;
     ZG[v].jumpable = initState.jumpable;
-    ZG[v].zone = initState.zone;
+    ZG[v].zone = initState.zone;    
     // the zone must contain the new clock variable T for the dwell time.
     // we admit > ... + 1 to use this function for timed pattern matching too.
     assert(ZG[v].zone.getNumOfVar() >= num_of_vars + 1);
+    ZG[v].zone.M = max_constraints;
     // reset the dwell time here
     ZG[v].zone.reset(ZG[v].zone.getNumOfVar() - 1);
 

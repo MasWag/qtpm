@@ -4,7 +4,7 @@
 
 /*!
   @brief Semiring-based (all source) shortest path problem
-  @param [in] G A weighted automaton.
+  @param [in] G A weighted graph.
   @param [out] distance The shortest cost from the initial cost.
  */
 template<typename WeightedGraph>

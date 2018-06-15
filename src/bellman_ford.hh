@@ -4,7 +4,7 @@
 
 /*!
   @brief Semiring-based (single source) shortest path problem
-  @param [in] G A weighted automaton.
+  @param [in] G A weighted graph.
   @param [in] init Initial cost of the vertices. For the vertices not in the list, the initial cost is one.
   @param [out] distance The shortest cost from the initial cost.
  */
