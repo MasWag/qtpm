@@ -94,6 +94,16 @@ struct DBM {
     value.row(x).tail(value.cols() - 1) = value.row(0).tail(value.cols() - 1);
   }
   
+  void release(uint8_t x) {
+    static constexpr double infinity = std::numeric_limits<double>::infinity();
+    // 0 is the special varibale here
+    x++;
+    value.col(x).fill(infinity);
+    value.row(x).fill(infinity);
+    value(0,x) = 0;
+    value(x,0) = infinity;
+  }
+
   void elapse() {
     static constexpr double infinity = std::numeric_limits<double>::infinity();
     value.col(0).fill(infinity);

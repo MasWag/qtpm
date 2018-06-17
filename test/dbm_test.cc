@@ -5,6 +5,31 @@
 
 BOOST_AUTO_TEST_SUITE(DBMTest)
 
+BOOST_AUTO_TEST_CASE( ReleaseTest )
+{
+  DBM orig, released;
+   orig = DBM::zero(3);
+
+  // 1 \le x \le 2
+  // 5 \le y \le 4
+  // unsatisfiable
+  orig.value <<
+    0, -1, -5, \
+    2,  0, std::numeric_limits<double>::infinity(), \
+    4, std::numeric_limits<double>::infinity(), 0;
+  released = orig;
+  released.release(1);
+
+  orig.canonize();
+  released.canonize();
+  BOOST_TEST(!orig.isSatisfiable());
+  BOOST_TEST(released.isSatisfiable());  
+
+  // The released variable should be non-negative.
+  released.tighten(1, -1, -1);
+  BOOST_TEST(!released.isSatisfiable());  
+}
+
 // BOOST_AUTO_TEST_CASE( findDurationTest )
 // {
 //   DBM orig, guard;

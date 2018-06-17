@@ -1,0 +1,8 @@
+digraph G {
+        0 [label="{x0 > 100, x1 < 30}"][init=1][match=0];
+        1 [label="{x0 > 100}"][init=0][match=0];
+        2 [init=0][match=1];
+        0->1 [reset="{0}"];
+        1->2 [guard="{x0 < 4}"];
+        2->0 [guard="{x0 > 5}"];
+}

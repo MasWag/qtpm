@@ -22,6 +22,9 @@ BOOST_AUTO_TEST_CASE(parseBoostPhi7TATest)
   BOOST_TEST( TA[0].isInit);
   BOOST_TEST(!TA[1].isInit);
   BOOST_TEST(!TA[2].isInit);
+  BOOST_CHECK_EQUAL(TA[0].label.size(), 2);
+  BOOST_CHECK_EQUAL(TA[1].label.size(), 1);
+  BOOST_CHECK_EQUAL(TA[2].label.size(), 0);
   auto transition = boost::edge(boost::vertex(0, TA), boost::vertex(1, TA), TA).first;
 
   BOOST_CHECK_EQUAL(boost::get(&BoostTATransition<ClockVariables>::resetVars, TA, transition).resetVars.size(), 1);
