@@ -1,1 +1,1 @@
-# boost-graph-timed-automata [![wercker status](https://app.wercker.com/status/a0cd4eebf0ad12cd32f5ec26d980849c/s/master "wercker status")](https://app.wercker.com/project/byKey/a0cd4eebf0ad12cd32f5ec26d980849c)
+# Quantitative Timed Pattern Matching [![wercker status](https://app.wercker.com/status/f1121fad1e4e172db519adf0da6d07f4/s/master "wercker status")](https://app.wercker.com/project/byKey/f1121fad1e4e172db519adf0da6d07f4)
