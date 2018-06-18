@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(zoneConstructionWithTTest0)
 
   using Weight = MaxMinSemiring<double>;
   using Value = double;
-  std::vector<BoostZoneGraphState<SignalVariables, ClockVariables, Value>> initConfTA;
+  std::vector<std::pair<BoostZoneGraphState<SignalVariables, ClockVariables, Value>, Weight>> initConfTA;
   initConfTA.reserve(initStatesTA.size());
   const auto num_of_vars = boost::get_property(TA, boost::graph_num_of_vars);
   BOOST_CHECK_GT(num_of_vars, 0);
@@ -49,13 +49,14 @@ BOOST_AUTO_TEST_CASE(zoneConstructionWithTTest0)
   const auto max_constraints = boost::get_property(TA, boost::graph_max_constraints);
   zeroDBM.M = max_constraints;
   for (const auto &init: initStatesTA) {
-    initConfTA.push_back({init, false, zeroDBM, std::vector<std::vector<Value>>{}});
+    initConfTA.emplace_back(BoostZoneGraphState<SignalVariables, ClockVariables, Value>{init, false, zeroDBM, std::vector<std::vector<Value>>{}}, Weight::one());
   }
 
   BoostZoneGraph<SignalVariables, ClockVariables, Weight, Value> ZG;
-  std::vector<typename BoostZoneGraph<SignalVariables, ClockVariables, Weight, Value>::vertex_descriptor> initStatesZG;
+  std::vector<std::pair<typename BoostZoneGraph<SignalVariables, ClockVariables, Weight, Value>::vertex_descriptor, Weight>> initStatesZG;
 
-  zoneConstructionWithT(TA, initConfTA, multipleSpaceRobustness<Weight, Value, ClockVariables>, std::vector<Value>{20, 30}, 3.0, ZG, initStatesZG);
+  std::function<Weight(const std::vector<Constraint<ClockVariables>> &,const std::vector<std::vector<Value>> &)> cost = multipleSpaceRobustness<Weight, Value, ClockVariables>;
+  zoneConstructionWithT(TA, initConfTA, cost, std::vector<Value>{20, 30}, 3.0, ZG, initStatesZG);
 
   // TODO: write some tests
 }
@@ -72,7 +73,7 @@ BOOST_AUTO_TEST_CASE(zoneConstructionWithTTest1)
 
   using Weight = MaxMinSemiring<double>;
   using Value = double;
-  std::vector<BoostZoneGraphState<SignalVariables, ClockVariables, Value>> initConfTA;
+  std::vector<std::pair<BoostZoneGraphState<SignalVariables, ClockVariables, Value>, Weight>> initConfTA;
   initConfTA.reserve(initStatesTA.size());
   const auto num_of_vars = boost::get_property(TA, boost::graph_num_of_vars);
   BOOST_CHECK_GT(num_of_vars, 0);
@@ -92,28 +93,29 @@ BOOST_AUTO_TEST_CASE(zoneConstructionWithTTest1)
   BOOST_CHECK_EQUAL(target((*boost::out_edges(q2, TA).first), TA), q0);
 
   initConfTA.reserve(2);
-  initConfTA.push_back({q0, false, zeroDBM, std::vector<std::vector<Value>>{}});
+  initConfTA.emplace_back(BoostZoneGraphState<SignalVariables, ClockVariables, Value>{q0, false, zeroDBM, std::vector<std::vector<Value>>{}}, Weight::one());
   zeroDBM.elapse();
   const std::vector<std::vector<Value>> valuations = {{130, 20}, {150, 10}};
-  initConfTA.push_back({q1, true,  zeroDBM, valuations});
+  initConfTA.emplace_back(BoostZoneGraphState<SignalVariables, ClockVariables, Value>{q1, true,  zeroDBM, valuations}, Weight::one());
 
   BoostZoneGraph<SignalVariables, ClockVariables, Weight, Value> ZG;
-  std::vector<typename BoostZoneGraph<SignalVariables, ClockVariables, Weight, Value>::vertex_descriptor> initStatesZG;
+  std::vector<std::pair<typename BoostZoneGraph<SignalVariables, ClockVariables, Weight, Value>::vertex_descriptor, Weight>> initStatesZG;
 
-  zoneConstructionWithT(TA, initConfTA, multipleSpaceRobustness<Weight, Value, ClockVariables>, std::vector<Value>{20, 30}, 3.0, ZG, initStatesZG);
+  std::function<Weight(const std::vector<Constraint<ClockVariables>> &,const std::vector<std::vector<Value>> &)> cost = multipleSpaceRobustness<Weight, Value, ClockVariables>;
+  zoneConstructionWithT(TA, initConfTA, cost, std::vector<Value>{20, 30}, 3.0, ZG, initStatesZG);
 
   // TODO: write some tests
   BOOST_CHECK_EQUAL(initStatesZG.size(), 2);
   BOOST_CHECK_EQUAL(boost::num_vertices(ZG), 8 + 7);
 
-  const std::array<typename BoostTimedAutomaton<SignalVariables, ClockVariables>::vertex_descriptor, 2> expectedInitZGTAStates = {q0, q1};
-  const std::array<bool, 2> expectedInitZGBs = {false, true};
-  const std::array<std::size_t, 2> expectedInitZGValuationsSize = {0, 2};
+  const std::array<typename BoostTimedAutomaton<SignalVariables, ClockVariables>::vertex_descriptor, 2> expectedInitZGTAStates = {{q0, q1}};
+  const std::array<bool, 2> expectedInitZGBs = {{false, true}};
+  const std::array<std::size_t, 2> expectedInitZGValuationsSize = {{0, 2}};
 
   for (int i = 0; i < 2; i++) {
-    BOOST_CHECK_EQUAL(ZG[initStatesZG[i]].vertex, expectedInitZGTAStates[i]);
-    BOOST_CHECK_EQUAL(ZG[initStatesZG[i]].jumpable, expectedInitZGBs[i]);
-    BOOST_CHECK_EQUAL(ZG[initStatesZG[i]].valuations.size(), expectedInitZGValuationsSize[i]);
+    BOOST_CHECK_EQUAL(ZG[initStatesZG[i].first].vertex, expectedInitZGTAStates[i]);
+    BOOST_CHECK_EQUAL(ZG[initStatesZG[i].first].jumpable, expectedInitZGBs[i]);
+    BOOST_CHECK_EQUAL(ZG[initStatesZG[i].first].valuations.size(), expectedInitZGValuationsSize[i]);
   }
 
 }
@@ -130,7 +132,7 @@ BOOST_AUTO_TEST_CASE(zoneConstructionWithTForPatternMatchingTest1)
 
   using Weight = MaxMinSemiring<double>;
   using Value = double;
-  std::vector<BoostZoneGraphState<SignalVariables, ClockVariables, Value>> initConfTA;
+  std::vector<std::pair<BoostZoneGraphState<SignalVariables, ClockVariables, Value>, Weight>> initConfTA;
   initConfTA.reserve(initStatesTA.size());
   const auto num_of_vars = boost::get_property(TA, boost::graph_num_of_vars);
   BOOST_CHECK_GT(num_of_vars, 0);
@@ -152,28 +154,29 @@ BOOST_AUTO_TEST_CASE(zoneConstructionWithTForPatternMatchingTest1)
   BOOST_CHECK_EQUAL(target((*boost::out_edges(q2, TA).first), TA), q0);
 
   initConfTA.reserve(2);
-  initConfTA.push_back({q0, false, zeroDBM, std::vector<std::vector<Value>>{}});
+  initConfTA.emplace_back(BoostZoneGraphState<SignalVariables, ClockVariables, Value>{q0, false, zeroDBM, std::vector<std::vector<Value>>{}}, Weight::one());
   zeroDBM.elapse();
   const std::vector<std::vector<Value>> valuations = {{130, 20}, {150, 10}};
-  initConfTA.push_back({q1, true,  zeroDBM, valuations});
+  initConfTA.emplace_back(BoostZoneGraphState<SignalVariables, ClockVariables, Value>{q1, true,  zeroDBM, valuations}, Weight::one());
 
   BoostZoneGraph<SignalVariables, ClockVariables, Weight, Value> ZG;
-  std::vector<typename BoostZoneGraph<SignalVariables, ClockVariables, Weight, Value>::vertex_descriptor> initStatesZG;
+  std::vector<std::pair<typename BoostZoneGraph<SignalVariables, ClockVariables, Weight, Value>::vertex_descriptor, Weight>> initStatesZG;
 
-  zoneConstructionWithT(TA, initConfTA, multipleSpaceRobustness<Weight, Value, ClockVariables>, std::vector<Value>{20, 30}, 3.0, ZG, initStatesZG);
+  std::function<Weight(const std::vector<Constraint<ClockVariables>> &,const std::vector<std::vector<Value>> &)> cost = multipleSpaceRobustness<Weight, Value, ClockVariables>;
+  zoneConstructionWithT(TA, initConfTA, cost, std::vector<Value>{20, 30}, 3.0, ZG, initStatesZG);
 
   // TODO: write some tests
   BOOST_CHECK_EQUAL(initStatesZG.size(), 2);
   BOOST_CHECK_EQUAL(boost::num_vertices(ZG), 8 + 7);
 
-  const std::array<typename BoostTimedAutomaton<SignalVariables, ClockVariables>::vertex_descriptor, 2> expectedInitZGTAStates = {q0, q1};
-  const std::array<bool, 2> expectedInitZGBs = {false, true};
-  const std::array<std::size_t, 2> expectedInitZGValuationsSize = {0, 2};
+  const std::array<typename BoostTimedAutomaton<SignalVariables, ClockVariables>::vertex_descriptor, 2> expectedInitZGTAStates = {{q0, q1}};
+  const std::array<bool, 2> expectedInitZGBs = {{false, true}};
+  const std::array<std::size_t, 2> expectedInitZGValuationsSize = {{0, 2}};
 
   for (int i = 0; i < 2; i++) {
-    BOOST_CHECK_EQUAL(ZG[initStatesZG[i]].vertex, expectedInitZGTAStates[i]);
-    BOOST_CHECK_EQUAL(ZG[initStatesZG[i]].jumpable, expectedInitZGBs[i]);
-    BOOST_CHECK_EQUAL(ZG[initStatesZG[i]].valuations.size(), expectedInitZGValuationsSize[i]);
+    BOOST_CHECK_EQUAL(ZG[initStatesZG[i].first].vertex, expectedInitZGTAStates[i]);
+    BOOST_CHECK_EQUAL(ZG[initStatesZG[i].first].jumpable, expectedInitZGBs[i]);
+    BOOST_CHECK_EQUAL(ZG[initStatesZG[i].first].valuations.size(), expectedInitZGValuationsSize[i]);
   }
 
 }
