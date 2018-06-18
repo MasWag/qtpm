@@ -123,7 +123,7 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
                            const std::vector<Value> &valuation,
                            const double duration,
                            BoostZoneGraph<SignalVariables, ClockVariables, Weight, Value> &ZG,
-                           std::vector<std::pair<typename BoostZoneGraph<SignalVariables, ClockVariables, Weight, Value>::vertex_descriptor,Weight>> &initStatesZG) {
+                           std::unordered_map<typename BoostZoneGraph<SignalVariables, ClockVariables, Weight, Value>::vertex_descriptor,Weight> &initStatesZG) {
   using TA_t = BoostTimedAutomaton<SignalVariables, ClockVariables>;
   using ZG_t = BoostZoneGraph<SignalVariables, ClockVariables, Weight, Value>;
   boost::unordered_map<std::tuple<typename TA_t::vertex_descriptor, bool, DBM::Tuple, std::vector<std::vector<Value>>>, typename ZG_t::vertex_descriptor> toZGState;
@@ -135,7 +135,6 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
                          };
   const auto dwellTimeClockVar = initConfTA.front().first.zone.getNumOfVar() - 1;
 
-  initStatesZG.reserve(initConfTA.size());
   std::vector<typename BoostZoneGraph<SignalVariables, ClockVariables, Weight, Value>::vertex_descriptor> nextConf;
   nextConf.reserve(initConfTA.size());
   for (const auto &initState: initConfTA) {
@@ -151,7 +150,7 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
     // reset the dwell time here
     ZG[v].zone.reset(ZG[v].zone.getNumOfVar() - 1);
 
-    initStatesZG.emplace_back(v, initState.second);
+    initStatesZG[v] = initState.second;
     nextConf.push_back(v);
 
     toZGState[convToKey(initState.first)] = v;

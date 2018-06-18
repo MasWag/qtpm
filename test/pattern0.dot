@@ -1,0 +1,8 @@
+digraph G {
+        1 [label="{x0 > 100}"][init=1][match=0]
+        2 [label="{x0 < 70}"][init=0][match=0]
+        3 [init=0][match=1]
+        1->2;
+        2->3;
+}
+
