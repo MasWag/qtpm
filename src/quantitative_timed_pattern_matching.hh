@@ -14,7 +14,7 @@ template<class SignalVariables, class ClockVariables, class Weight, class Value>
 class QuantitativeTimedPatternMatching
 {
 public:
-  using ResultMatrix = Eigen::Matrix<double, 3, 3>;
+  using ResultMatrix = std::array<double, 6>;
 private:
   //types
 
@@ -90,14 +90,12 @@ public:
 
     for (auto &w: distance) {
       if (TA[ZG[w.first].vertex].isMatch) {
-        ResultMatrix mat;
-        mat.diagonal().fill(0);
-        mat(2, 1) = ZG[w.first].zone.value(numOfClockVariables + 2 - 1, 0);
-        mat(1, 2) = ZG[w.first].zone.value(0, numOfClockVariables + 2 - 1);
-        mat(2, 0) = ZG[w.first].zone.value(numOfClockVariables + 2, 0) + absTime;
-        mat(0, 2) = ZG[w.first].zone.value(0, numOfClockVariables + 2) - absTime;
-        mat(1, 0) = ZG[w.first].zone.value(numOfClockVariables + 2, numOfClockVariables + 2 - 1) + absTime;
-        mat(0, 1) = ZG[w.first].zone.value(numOfClockVariables + 2 - 1, numOfClockVariables + 2) - absTime;
+        ResultMatrix mat = {{ZG[w.first].zone.value(numOfClockVariables + 2, numOfClockVariables + 2 - 1) + absTime,
+                             ZG[w.first].zone.value(numOfClockVariables + 2 - 1, numOfClockVariables + 2) - absTime,
+                             ZG[w.first].zone.value(numOfClockVariables + 2, 0) + absTime,
+                             ZG[w.first].zone.value(0, numOfClockVariables + 2) - absTime,
+                             ZG[w.first].zone.value(0, numOfClockVariables + 2 - 1),
+                             ZG[w.first].zone.value(numOfClockVariables + 2 - 1, 0)}};
 
         result.emplace_back(std::move(mat), std::move(w.second));
       }
