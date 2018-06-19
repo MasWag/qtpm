@@ -38,12 +38,11 @@ BOOST_AUTO_TEST_CASE( QTPMTest0 )
   std::vector<std::pair<decltype(qtpm)::ResultMatrix, Weight>> result;
   qtpm.getResult(result);
 
-  for (const auto& r: result) {
-    // TODO: max of them should be -80.
-    std::cout << r.second.data << std::endl;
-  }
-
   BOOST_CHECK_EQUAL(result.size(), 2);
+  BOOST_CHECK_EQUAL(std::accumulate(result.begin(), result.end(), Weight::zero(),
+                                    [](Weight init, std::pair<decltype(qtpm)::ResultMatrix, Weight> p) {
+                                      return init + p.second.data;
+                                    }).data, -80);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

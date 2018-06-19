@@ -179,10 +179,10 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
     }
 
     if (jumpable) {
-      boost::put(boost::edge_weight_t(), ZG, edge, cost(TA[ZG[currentZGState].vertex].label,
-                                                        ZG[currentZGState].valuations));
+      boost::put(boost::edge_weight, ZG, edge, cost(TA[ZG[currentZGState].vertex].label,
+                                                    ZG[currentZGState].valuations));
     } else {
-      boost::put(boost::edge_weight_t(), ZG, edge, Weight::one());
+      boost::put(boost::edge_weight, ZG, edge, Weight::one());
     }
   };
 
@@ -225,15 +225,15 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
             nextZone.abstractize();
             nextZone.canonize();
 
-            addEdge(currentZGState, nextTAState, false, nextZone, {});
+            auto nextValuations = ZG[currentZGState].valuations;
+            nextValuations.push_back(valuation);
+            addEdge(currentZGState, nextTAState, false, nextZone, nextValuations);
           }
         }        
       } else {
         // continuous transition
-        auto nextValuations = ZG[currentZGState].valuations;
-        nextValuations.push_back(valuation);
         nowZone.elapse();
-        addEdge(currentZGState, ZG[currentZGState].vertex, true, nowZone, nextValuations);
+        addEdge(currentZGState, ZG[currentZGState].vertex, true, nowZone, {});
       }
     }
   }

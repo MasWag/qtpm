@@ -102,4 +102,63 @@ BOOST_AUTO_TEST_CASE(parseBoostTASimpleTest)
   }
 }
 
+BOOST_AUTO_TEST_CASE(parseBoostTASimpleTest1)
+{
+  using SignalVariables = uint8_t;
+  using ClockVariables = uint8_t;
+  BoostTimedAutomaton<SignalVariables, ClockVariables> TA;
+  std::ifstream file("../test/small3.dot");
+  std::vector<typename BoostTimedAutomaton<SignalVariables, ClockVariables>::vertex_descriptor> initStates;
+  parseBoostTA(file, TA, initStates);
+
+  constexpr const std::size_t expected_num_vertices = 3;
+  BOOST_CHECK_EQUAL(boost::num_vertices(TA), expected_num_vertices);
+
+  std::array<bool, expected_num_vertices> initResult  = {{true, false, false}};
+  std::array<bool, expected_num_vertices> matchResult = {{false, false, true}};
+  std::array<std::size_t, expected_num_vertices> labelNumResult  = {{2, 1, 0}};
+  std::array<int, expected_num_vertices> labelXResult  = {{0, 0, 0}};
+  std::array<int, expected_num_vertices> labelCResult  = {{100, 100, 0}};
+  std::array<Constraint<ClockVariables>::Order, expected_num_vertices> labelOdrResult  = {{Constraint<ClockVariables>::Order::gt,
+                                                                       Constraint<ClockVariables>::Order::gt, 
+                                                                       Constraint<ClockVariables>::Order::gt}};
+
+  for (std::size_t i = 0; i < expected_num_vertices; i++) {
+    BOOST_CHECK_EQUAL(TA[i].isInit,  initResult[i]);
+    BOOST_CHECK_EQUAL(TA[i].isMatch, matchResult[i]);
+    BOOST_CHECK_EQUAL(TA[i].label.size(), labelNumResult[i]);
+    if (labelNumResult[i]) {
+      BOOST_CHECK_EQUAL(TA[i].label[0].x, labelXResult[i]);
+      BOOST_CHECK_EQUAL(TA[i].label[0].c, labelCResult[i]);
+      BOOST_TEST((TA[i].label[0].odr == labelOdrResult[i]));
+    }
+  }
+
+  constexpr const std::size_t expected_num_edges = 3;
+
+  std::array<typename BoostTimedAutomaton<SignalVariables, ClockVariables>::edge_descriptor, expected_num_edges> transitions = {{
+      boost::edge(boost::vertex(0, TA), boost::vertex(1, TA), TA).first,
+      boost::edge(boost::vertex(1, TA), boost::vertex(2, TA), TA).first,
+      boost::edge(boost::vertex(2, TA), boost::vertex(0, TA), TA).first,
+    }};
+
+  std::array<std::size_t, expected_num_edges> resetVarNumResult  = {{1, 0, 0}};
+  std::array<std::size_t, expected_num_edges> guardNumResult  = {{0, 1, 1}};
+  std::array<int, expected_num_edges> guardXResult  = {{0, 0, 0}};
+  std::array<int, expected_num_edges> guardCResult  = {{0, 4, 5}};
+  std::array<Constraint<ClockVariables>::Order, expected_num_edges> guardOdrResult  = {{Constraint<ClockVariables>::Order::lt,
+                                                                       Constraint<ClockVariables>::Order::lt, 
+                                                                       Constraint<ClockVariables>::Order::gt}};
+
+  for (std::size_t i = 0; i < expected_num_edges; i++) {
+    BOOST_CHECK_EQUAL(boost::get(&BoostTATransition<ClockVariables>::resetVars, TA, transitions[i]).resetVars.size(), resetVarNumResult[i]);
+    BOOST_CHECK_EQUAL(boost::get(&BoostTATransition<ClockVariables>::guard, TA, transitions[i]).size(), guardNumResult[i]);
+    if (guardNumResult[i]) {
+      BOOST_CHECK_EQUAL(boost::get(&BoostTATransition<ClockVariables>::guard, TA, transitions[i])[0].x, guardXResult[i]);
+      BOOST_CHECK_EQUAL(boost::get(&BoostTATransition<ClockVariables>::guard, TA, transitions[i])[0].c, guardCResult[i]);
+      BOOST_TEST((boost::get(&BoostTATransition<ClockVariables>::guard, TA, transitions[i])[0].odr == guardOdrResult[i]));
+    }
+  }
+}
+
 BOOST_AUTO_TEST_SUITE_END()
