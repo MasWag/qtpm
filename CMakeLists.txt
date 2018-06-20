@@ -9,6 +9,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-flto -O3 -DRELEASE")
 
 find_package(Boost 1.59.0 REQUIRED COMPONENTS
   program_options unit_test_framework iostreams graph)
+find_package(Eigen3 REQUIRED)
 
 include_directories(
   src/
@@ -16,8 +17,13 @@ include_directories(
   ${Boost_INCLUDE_DIRS})
 
 ## Config for Main monaa
+add_executable(qtpm
+  src/main.cc)
+target_link_libraries(qtpm
+#  profiler
+ ${Boost_PROGRAM_OPTIONS_LIBRARY}
+ ${Boost_GRAPH_LIBRARY})
 
-## Config for libmonaa
 
 ## Config for Test
 enable_testing()

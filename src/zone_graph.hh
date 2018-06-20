@@ -236,6 +236,7 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
       } else {
         // continuous transition
         nowZone.elapse();
+        nowZone.tighten(dwellTimeClockVar,-1, {duration, true});
         addEdge(currentZGState, ZG[currentZGState].vertex, true, nowZone, {});
       }
     }

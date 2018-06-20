@@ -14,7 +14,7 @@ Usage
 **-h**, **--help** Print a help message. <br />
 **-q**, **--quiet** Quiet mode. Causes any results to be suppressed. <br />
 **-V**, **--version** Print the version <br />
-**-i** *file*, **--input** *file* Read a timed word from *file*. <br />
+**-i** *file*, **--input** *file* Read a signal from *file*. <br />
 **-f** *file*, **--automaton** *file* Read a timed automaton from *file*. <br />
 **--maxmin**  Use max-min semiring robust semantics (default). <br />
 **--minplus**  Use min-plus semiring robust semantics . <br />
@@ -37,3 +37,12 @@ This software is tested on Arch Linux and Mac OSX 10.13.5
 mkdir build
 cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && make && make install
 ```
+
+Input Format
+------------
+
+### Signal
+
+A signal is a sequence of the following line.
+
+    v(x1) v(x2) v(x3) ... v(xn) abs_time

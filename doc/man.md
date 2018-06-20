@@ -12,7 +12,7 @@ qtpm - An experimental implementation of Quantitative Timed Pattern Matching wit
 
 # DESCRIPTION
 
-The tool **qtpm** reads timed word from standard input or a file and execute quantitative timed pattern matching.
+The tool **qtpm** reads signal from standard input or a file and execute quantitative timed pattern matching.
 
 The options are as follows:
 
@@ -26,7 +26,7 @@ The options are as follows:
 : Print the version.
 
 **-i** *file*, **--input** *file*
-: Read a timed word from *file*.
+: Read a signal from *file*.
 
 **-f** *file*, **--automaton** *file*
 : Read a (timed) automaton from *file*.
@@ -48,6 +48,10 @@ The options are as follows:
 
 The command:
 
-    qtpm -f ta.dot < timed_word.txt
+    qtpm -f ta.dot < signal.txt
     
-read the word from *timed_word.txt* and write the result of quantitative timed pattern matching masked word to standard output. The semantics is the space robustness over max-min semiring.
+or 
+
+    qtpm -f ta.dot -i signal.txt
+
+read the word from *signal.txt* and write the result of quantitative timed pattern matching masked word to standard output. The semantics is the space robustness over max-min semiring.

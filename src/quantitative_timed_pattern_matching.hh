@@ -80,20 +80,23 @@ public:
     std::unordered_map<ZGState, Weight> distance;
     bellman_ford<std::queue<ZGState>>(ZG, initStatesZG, distance);
     configuration.clear();
+
     for (auto w: distance) {
-      ZG[w.first].zone.tighten(-1, numOfClockVariables + 2 - 1, Bounds{-duration, true});
-      ZG[w.first].zone.tighten(numOfClockVariables + 2 - 1, -1, Bounds{duration, true});
-      if (ZG[w.first].zone.isSatisfiable()) {
-        configuration.emplace_back(BoostZoneGraphState<SignalVariables, ClockVariables, Value>{ZG[w.first].vertex, ZG[w.first].jumpable, ZG[w.first].zone, ZG[w.first].valuations}, w.second);
+      auto z = ZG[w.first].zone;
+      z.tighten(-1, numOfClockVariables + 2 - 1, Bounds{-duration, true});
+      z.tighten(numOfClockVariables + 2 - 1, -1, Bounds{duration, true});
+      if (z.isSatisfiable()) {
+        configuration.emplace_back(BoostZoneGraphState<SignalVariables, ClockVariables, Value>{ZG[w.first].vertex, ZG[w.first].jumpable, z, ZG[w.first].valuations}, w.second);
       }
     }
 
     for (auto &w: distance) {
       if (TA[ZG[w.first].vertex].isMatch) {
-        ResultMatrix mat = {{ZG[w.first].zone.value(numOfClockVariables + 2, numOfClockVariables + 2 - 1) + absTime,
-                             ZG[w.first].zone.value(numOfClockVariables + 2 - 1, numOfClockVariables + 2) - absTime,
-                             ZG[w.first].zone.value(numOfClockVariables + 2, 0) + absTime,
+        //        assert(ZG[w.first].zone.isSatisfiable());
+        ResultMatrix mat = {{ZG[w.first].zone.value(numOfClockVariables + 2 - 1, numOfClockVariables + 2) - absTime,
+                             ZG[w.first].zone.value(numOfClockVariables + 2, numOfClockVariables + 2 - 1) + absTime,
                              ZG[w.first].zone.value(0, numOfClockVariables + 2) - absTime,
+                             ZG[w.first].zone.value(numOfClockVariables + 2, 0) + absTime,
                              ZG[w.first].zone.value(0, numOfClockVariables + 2 - 1),
                              ZG[w.first].zone.value(numOfClockVariables + 2 - 1, 0)}};
 
@@ -106,5 +109,8 @@ public:
 
   void getResult(std::vector<std::pair<ResultMatrix, Weight>> &v) const {
     v = result;
+  }
+  std::vector<std::pair<ResultMatrix, Weight>>& getResultRef()  {
+    return result;
   }
 };
