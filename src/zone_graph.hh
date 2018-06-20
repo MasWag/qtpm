@@ -158,8 +158,8 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
     toZGState[convToKey(initState.first)] = v;
   }
 
-  const auto addEdge = [&toZGState,&ZG,&nextConf,&TA,&cost] (const auto currentZGState, const auto nextTAState, const bool jumpable, const DBM &zone, const std::vector<std::vector<Value>> &valuations) {
-    auto zgState = toZGState.find(std::make_tuple(nextTAState, jumpable, zone.toTuple(), valuations));
+  const auto addEdge = [&toZGState,&ZG,&nextConf,&TA,&cost] (const auto currentZGState, const auto nextTAState, const bool jumpable, const DBM &zone, const std::vector<std::vector<Value>> &nextValuations, const std::vector<std::vector<Value>> &currentValuations) {
+    auto zgState = toZGState.find(std::make_tuple(nextTAState, jumpable, zone.toTuple(), nextValuations));
     typename ZG_t::edge_descriptor edge;
 
     if (zgState != toZGState.end()) {
@@ -173,14 +173,14 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
       ZG[nextZGState].vertex = nextTAState;
       ZG[nextZGState].jumpable = jumpable;
       ZG[nextZGState].zone = zone;
-      ZG[nextZGState].valuations = valuations;
-      toZGState[std::make_tuple(nextTAState, jumpable, zone.toTuple(), valuations)] = nextZGState;
+      ZG[nextZGState].valuations = nextValuations;
+      toZGState[std::make_tuple(nextTAState, jumpable, zone.toTuple(), nextValuations)] = nextZGState;
       edge = std::get<0>(boost::add_edge(currentZGState, nextZGState, ZG));
 
       nextConf.push_back (nextZGState);
     }
 
-    if (jumpable) {
+    if (!jumpable) {
       boost::put(boost::edge_weight, ZG, edge, cost(TA[ZG[currentZGState].vertex].label,
                                                     ZG[currentZGState].valuations));
     } else {
@@ -228,16 +228,16 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
             nextZone.abstractize();
             nextZone.canonize();
 
-            auto nextValuations = ZG[currentZGState].valuations;
-            nextValuations.push_back(valuation);
-            addEdge(currentZGState, nextTAState, false, nextZone, nextValuations);
+            addEdge(currentZGState, nextTAState, false, nextZone, {}, ZG[currentZGState].valuations);
           }
         }        
       } else {
         // continuous transition
+        auto nextValuations = ZG[currentZGState].valuations;
+        nextValuations.push_back(valuation);
         nowZone.elapse();
         nowZone.tighten(dwellTimeClockVar,-1, {duration, true});
-        addEdge(currentZGState, ZG[currentZGState].vertex, true, nowZone, {});
+        addEdge(currentZGState, ZG[currentZGState].vertex, true, nowZone, nextValuations, ZG[currentZGState].valuations);
       }
     }
   }

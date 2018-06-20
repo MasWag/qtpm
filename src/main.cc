@@ -65,6 +65,8 @@ static inline void QTPM(QuantitativeTimedPatternMatching<SignalVariables, ClockV
     } else {
       qtpm.feed(valuation, time);
     }
+    valuation.clear();
+
     auto result = qtpm.getResultRef();
     if (!quiet) {
       std::array<Bounds, 6> arr;
