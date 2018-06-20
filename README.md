@@ -45,4 +45,4 @@ Input Format
 
 A signal is a sequence of the following line.
 
-    v(x1) v(x2) v(x3) ... v(xn) abs_time
+    v(x1) v(x2) v(x3) ... v(xn) time
