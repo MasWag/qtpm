@@ -33,13 +33,13 @@ static inline char *fgets_unsafe(char * chr, int n, FILE *stream) {
 }
 
 template<class Value>
-static inline int getOne(FILE* file, double &absTime, std::vector<Value> &valuation) {
+static inline int getOne(FILE* file, double &time, std::vector<Value> &valuation) {
   std::array<char, 100> str;
   if (!fgets_unsafe(str.data(), 100, file)) {
     return EOF;
   }
   std::stringstream ss(std::string(str.data()));
-  ss >> absTime;
+  ss >> time;
   
   while (!ss.eof()) {
     Value v;
@@ -53,13 +53,18 @@ static inline int getOne(FILE* file, double &absTime, std::vector<Value> &valuat
 }
 
 template<class SignalVariables, class ClockVariables, class Weight, class Value>
-static inline void QTPM(QuantitativeTimedPatternMatching<SignalVariables, ClockVariables, Weight, Value> &qtpm, FILE* fin, FILE* fout, bool quiet) {
+static inline void QTPM(QuantitativeTimedPatternMatching<SignalVariables, ClockVariables, Weight, Value> &qtpm, FILE* fin, FILE* fout, bool quiet, bool isAbsTime) {
   flockfile(fin);
-  double absTime;
+  double time;
   std::vector<Value> valuation;
-  while(getOne(fin, absTime, valuation) != EOF) {
-    qtpm.feed(valuation, absTime);
-
+  double last_time = 0.0;
+  while(getOne(fin, time, valuation) != EOF) {
+    if (isAbsTime) {
+      qtpm.feed(valuation, time - last_time);
+      last_time = time;
+    } else {
+      qtpm.feed(valuation, time);
+    }
     auto result = qtpm.getResultRef();
     if (!quiet) {
       std::array<Bounds, 6> arr;
@@ -99,6 +104,7 @@ int main(int argc, char *argv[])
     ("version,V", "version")
     ("input,i", value<std::string>(&timedWordFileName)->default_value("stdin"),"input file of Timed Words")
     ("automaton,f", value<std::string>(&timedAutomatonFileName)->default_value(""),"input file of Timed Automaton")
+    ("abs,a", "absolute time mode")
     ("maxmin", "use maxmin semiring space robustness (default)")
     ("minplus", "use minplus semiring space robustness");
 
@@ -138,12 +144,12 @@ int main(int argc, char *argv[])
     using Weight = MinPlusSemiring<Value>;
     std::function<Weight(const std::vector<Constraint<ClockVariables>> &,const std::vector<std::vector<Value>> &)> cost = multipleSpaceRobustness<Weight, Value, ClockVariables>;
     QuantitativeTimedPatternMatching<SignalVariables, ClockVariables, Weight, Value> qtpm(TA, initStates, cost);
-    QTPM(qtpm, file, stdout, vm.count("quiet"));
+    QTPM(qtpm, file, stdout, vm.count("quiet"), vm.count("abs"));
   } else {
     using Weight = MaxMinSemiring<Value>;
     std::function<Weight(const std::vector<Constraint<ClockVariables>> &,const std::vector<std::vector<Value>> &)> cost = multipleSpaceRobustness<Weight, Value, ClockVariables>;
     QuantitativeTimedPatternMatching<SignalVariables, ClockVariables, Weight, Value> qtpm(TA, initStates, cost);
-    QTPM(qtpm, file, stdout, vm.count("quiet"));
+    QTPM(qtpm, file, stdout, vm.count("quiet"), vm.count("abs"));
   }
 
   return 0;

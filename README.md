@@ -16,6 +16,7 @@ Usage
 **-V**, **--version** Print the version <br />
 **-i** *file*, **--input** *file* Read a signal from *file*. <br />
 **-f** *file*, **--automaton** *file* Read a timed automaton from *file*. <br />
+**-a**, **--abs** absolute time mode
 **--maxmin**  Use max-min semiring robust semantics (default). <br />
 **--minplus**  Use min-plus semiring robust semantics . <br />
 

@@ -37,6 +37,9 @@ The options are as follows:
 **-t**, **--timed**
 : Timed filtering mode.
 
+**-a**, **--abs**:
+absolute time mode
+
 **--maxmin** (default)
 : Use max-min semiring robust semantics.
 
