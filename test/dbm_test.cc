@@ -14,9 +14,9 @@ BOOST_AUTO_TEST_CASE( ReleaseTest )
   // 5 \le y \le 4
   // unsatisfiable
   orig.value <<
-    0, -1, -5, \
-    2,  0, std::numeric_limits<double>::infinity(), \
-    4, std::numeric_limits<double>::infinity(), 0;
+    Bounds{0, true}, Bounds{-1, true}, Bounds{-5, true}, \
+    Bounds{2, true},  Bounds{0, true}, Bounds{std::numeric_limits<double>::infinity(), true}, \
+    Bounds{4, true}, Bounds{std::numeric_limits<double>::infinity(), true}, Bounds{0, true};
   released = orig;
   released.release(1);
 
@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE( ReleaseTest )
   BOOST_TEST(released.isSatisfiable());  
 
   // The released variable should be non-negative.
-  released.tighten(1, -1, -1);
+  released.tighten(1, -1, Bounds{-1, true});
   BOOST_TEST(!released.isSatisfiable());  
 }
 

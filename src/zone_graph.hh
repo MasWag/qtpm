@@ -31,7 +31,7 @@ void zoneConstruction(const BoostTimedAutomaton<SignalVariables, ClockVariables>
   const auto max_constraints = boost::get_property(TA, boost::graph_max_constraints);
   const auto num_of_vars = boost::get_property(TA, boost::graph_num_of_vars);
   auto zeroDBM = DBM::zero(num_of_vars + 1);
-  zeroDBM.M = max_constraints;
+  zeroDBM.M = Bounds{max_constraints, true};
 
   initStatesZG.reserve(initStatesTA.size());
   for (const auto &initState: initStatesTA) {
@@ -62,12 +62,14 @@ void zoneConstruction(const BoostTimedAutomaton<SignalVariables, ClockVariables>
         for (const auto &delta : guard) {
           switch (delta.odr) {
           case Constraint<ClockVariables>::Order::lt:
+            nextZone.tighten(delta.x,-1,{delta.c, false});
           case Constraint<ClockVariables>::Order::le:
-            nextZone.tighten(delta.x,-1, delta.c);
+            nextZone.tighten(delta.x,-1,{delta.c, true});
             break;
           case Constraint<ClockVariables>::Order::gt:
+            nextZone.tighten(-1,delta.x,{-delta.c, false});
           case Constraint<ClockVariables>::Order::ge:
-            nextZone.tighten(-1,delta.x, -delta.c);
+            nextZone.tighten(-1,delta.x,{-delta.c, true});
             break;
           }
         }
@@ -146,7 +148,7 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
     // the zone must contain the new clock variable T for the dwell time.
     // we admit > ... + 1 to use this function for timed pattern matching too.
     assert(ZG[v].zone.getNumOfVar() >= num_of_vars + 1);
-    ZG[v].zone.M = max_constraints;
+    ZG[v].zone.M = Bounds{max_constraints, true};
     // reset the dwell time here
     ZG[v].zone.reset(ZG[v].zone.getNumOfVar() - 1);
 
@@ -195,7 +197,7 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
       auto taState = ZG[currentZGState].vertex;
       bool jumpable = ZG[currentZGState].jumpable;
       DBM nowZone = ZG[currentZGState].zone;
-      nowZone.tighten(dwellTimeClockVar,-1, duration);
+      nowZone.tighten(dwellTimeClockVar,-1, {duration, true});
 
       if (jumpable) {
         // discrete transition
@@ -208,13 +210,14 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
           for (const auto &delta : guard) {
             switch (delta.odr) {
             case Constraint<ClockVariables>::Order::lt:
+              nextZone.tighten(delta.x,-1,{delta.c, false});
             case Constraint<ClockVariables>::Order::le:
-              nextZone.tighten(delta.x,-1, delta.c);
+              nextZone.tighten(delta.x,-1,{delta.c, true});
               break;
             case Constraint<ClockVariables>::Order::gt:
+              nextZone.tighten(-1,delta.x,{-delta.c, false});
             case Constraint<ClockVariables>::Order::ge:
-              nextZone.tighten(-1,delta.x, -delta.c);
-              break;
+              nextZone.tighten(-1,delta.x,{-delta.c, true});
             }
           }
 

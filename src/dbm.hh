@@ -7,35 +7,45 @@
 
 #include "constraint.hh"
 
-// using Bounds = std::pair<double, bool>;
-// static inline Bounds
-// operator+ (const Bounds &a,const Bounds &b) {
-//   return Bounds(a.first + b.first, a.second && b.second);
-// }
-// static inline Bounds
-// operator- (const Bounds &a,const Bounds &b) {
-//   return Bounds(a.first - b.first, a.second && b.second);
-// }
-// static inline void
-// operator+= (Bounds &a, const Bounds b) {
-//   a.first += b.first;
-//   a.second = a.second && b.second;
-// }
-// namespace std {
-//   static inline std::ostream &operator<<(std::ostream &os, const Bounds &b) {
-//     os << "(" << b.first << ", " << b.second << ")";
-//     return os;
-//   }
-// }
-//;
+using Bounds = std::pair<double, bool>;
+static inline Bounds
+operator+ (const Bounds &a,const Bounds &b) {
+  return Bounds(a.first + b.first, a.second && b.second);
+}
+static inline Bounds
+operator- (const Bounds &a,const Bounds &b) {
+  return Bounds(a.first - b.first, a.second && b.second);
+}
+static inline void
+operator+= (Bounds &a, const Bounds b) {
+  a.first += b.first;
+  a.second = a.second && b.second;
+}
+namespace std {
+  static inline std::ostream &operator<<(std::ostream &os, const Bounds &b) {
+    os << "(" << b.first << ", " << b.second << ")";
+    return os;
+  }
+}
+static inline Bounds
+operator+ (Bounds a, const double b) {
+  a.first += b;
+  return a;
+}
+static inline Bounds
+operator- (Bounds a, const double b) {
+  a.first -= b;
+  return a;
+}
+
 
 #include <eigen3/Eigen/Core>
 //! @TODO configure include directory for eigen
 
 struct DBM {
-  using Tuple = std::tuple<std::vector<double>, double>;
-  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> value;
-  double M;
+  using Tuple = std::tuple<std::vector<Bounds>,Bounds>;
+  Eigen::Matrix<Bounds, Eigen::Dynamic, Eigen::Dynamic> value;
+  Bounds M;
 
   inline std::size_t getNumOfVar() const {
     return value.cols() - 1;
@@ -44,7 +54,7 @@ struct DBM {
   inline void cutVars (std::shared_ptr<DBM> &out,std::size_t from,std::size_t to) {
     out = std::make_shared<DBM>();
     out->value.resize(to - from + 2, to - from + 2);
-    out->value.block(0,0,1,1) << 0;
+    out->value.block(0,0,1,1) << Bounds(0,true);
     out->value.block(1, 1, to - from + 1, to - from + 1) = value.block(from + 1, from + 1, to - from + 1,to - from + 1);
     out->value.block(1, 0, to - from + 1, 1) = value.block(from + 1, 0, to - from + 1, 1);
     out->value.block(0, 1, 1, to - from + 1) = value.block(0, from + 1, 1, to - from + 1);
@@ -57,17 +67,17 @@ struct DBM {
       return zeroZone;
     }
     zeroZone.value.resize(size, size);
-    zeroZone.value.fill(0);
+    zeroZone.value.fill(Bounds(0, true));
     return zeroZone;
   }
 
-  std::tuple<std::vector<double>,double> toTuple() const {
+  std::tuple<std::vector<Bounds>,Bounds> toTuple() const {
     // omit (0,0)
-    return std::tuple<std::vector<double>,double>(std::vector<double>(value.data() + 1, value.data() + value.size()),M);
+    return std::tuple<std::vector<Bounds>,Bounds>(std::vector<Bounds>(value.data() + 1, value.data() + value.size()),M);
   }
 
   //! @brief add the constraint x - y \le (c,s)
-  void tighten(uint8_t x, uint8_t y, double c) {
+  void tighten(uint8_t x, uint8_t y, Bounds c) {
     x++;
     y++;
     value(x,y) = std::min(value(x, y), c);
@@ -88,24 +98,24 @@ struct DBM {
   void reset(uint8_t x) {
     // 0 is the special varibale here
     x++;
-    value(0,x) = 0;
-    value(x,0) = 0;
+    value(0,x) = Bounds(0, true);
+    value(x,0) = Bounds(0, true);
     value.col(x).tail(value.rows() - 1) = value.col(0).tail(value.rows() - 1);
     value.row(x).tail(value.cols() - 1) = value.row(0).tail(value.cols() - 1);
   }
   
   void release(uint8_t x) {
-    static constexpr double infinity = std::numeric_limits<double>::infinity();
+    static constexpr Bounds infinity = Bounds(std::numeric_limits<double>::infinity(), false);
     // 0 is the special varibale here
     x++;
     value.col(x).fill(infinity);
     value.row(x).fill(infinity);
-    value(0,x) = 0;
+    value(0,x) = Bounds(0, true);
     value(x,0) = infinity;
   }
 
   void elapse() {
-    static constexpr double infinity = std::numeric_limits<double>::infinity();
+    static constexpr Bounds infinity = Bounds(std::numeric_limits<double>::infinity(), false);
     value.col(0).fill(infinity);
     // for (int i = 0; i < value.row(0).size(); ++i) {
     //   value.row(0)[i].second = false;
@@ -120,11 +130,11 @@ struct DBM {
 
   bool isSatisfiable() {
     canonize();
-    return (value + value.transpose()).minCoeff() >= 0.0;
+    return (value + value.transpose()).minCoeff() >= Bounds(0.0, true);
   }
 
   void abstractize() {
-    static constexpr double infinity = std::numeric_limits<double>::infinity();//, false);
+    static constexpr Bounds infinity = Bounds(std::numeric_limits<double>::infinity(), false);
     for (auto it = value.data(); it < value.data() + value.size(); it++) {
       if (*it >= M) {
         *it = infinity;
@@ -133,7 +143,7 @@ struct DBM {
   }
 
   void makeUnsat() {
-    value(0, 0) = -std::numeric_limits<double>::infinity();//, false);
+    value(0, 0) = Bounds(-std::numeric_limits<double>::infinity(), false);
   }
 
   bool operator== (DBM z) const {

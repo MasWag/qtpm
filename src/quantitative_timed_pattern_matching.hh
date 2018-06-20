@@ -14,7 +14,7 @@ template<class SignalVariables, class ClockVariables, class Weight, class Value>
 class QuantitativeTimedPatternMatching
 {
 public:
-  using ResultMatrix = std::array<double, 6>;
+  using ResultMatrix = std::array<Bounds, 6>;
 private:
   //types
 
@@ -81,8 +81,8 @@ public:
     bellman_ford<std::queue<ZGState>>(ZG, initStatesZG, distance);
     configuration.clear();
     for (auto w: distance) {
-      ZG[w.first].zone.tighten(-1, numOfClockVariables + 2 - 1, -duration);
-      ZG[w.first].zone.tighten(numOfClockVariables + 2 - 1, -1, duration);
+      ZG[w.first].zone.tighten(-1, numOfClockVariables + 2 - 1, Bounds{-duration, true});
+      ZG[w.first].zone.tighten(numOfClockVariables + 2 - 1, -1, Bounds{duration, true});
       if (ZG[w.first].zone.isSatisfiable()) {
         configuration.emplace_back(BoostZoneGraphState<SignalVariables, ClockVariables, Value>{ZG[w.first].vertex, ZG[w.first].jumpable, ZG[w.first].zone, ZG[w.first].valuations}, w.second);
       }
