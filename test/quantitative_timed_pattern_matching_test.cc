@@ -35,10 +35,10 @@ BOOST_AUTO_TEST_CASE( QTPMTest0 )
     qtpm.feed(valuations[i], durations[i]);
   }
 
-  std::vector<std::pair<decltype(qtpm)::ResultMatrix, Weight>> result;
+  boost::unordered_map<decltype(qtpm)::ResultMatrix, Weight> result;
   qtpm.getResult(result);
 
-  BOOST_CHECK_EQUAL(result.size(), 2);
+  BOOST_CHECK_EQUAL(result.size(), 1);
   BOOST_CHECK_EQUAL(std::accumulate(result.begin(), result.end(), Weight::zero(),
                                     [](Weight init, std::pair<decltype(qtpm)::ResultMatrix, Weight> p) {
                                       return init + p.second.data;

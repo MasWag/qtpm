@@ -42,7 +42,7 @@ private:
     @brief result vector
     @todo consider better data structure (something like segment tree)
   */
-  std::vector<std::pair<ResultMatrix, Weight>> result = {};
+  boost::unordered_map<ResultMatrix, Weight> result = {};
 
 public:
 
@@ -60,6 +60,7 @@ public:
     @note It is not a problem to give the same valuation consecutively.
    */
   void feed(const std::vector<Value> &valuation, const double duration) {
+
     for (auto &c: configuration) {
       c.first.zone.reset(numOfClockVariables + 2 - 1);
       if (c.first.jumpable) {
@@ -100,17 +101,21 @@ public:
                              ZG[w.first].zone.value(0, numOfClockVariables + 2 - 1),
                              ZG[w.first].zone.value(numOfClockVariables + 2 - 1, 0)}};
 
-        result.emplace_back(std::move(mat), std::move(w.second));
+        if (result.find(mat) == result.end()) {
+          result[std::move(mat)] = std::move(w.second);
+        } else {
+          result[std::move(mat)] += std::move(w.second);
+        }
       }
     }
 
     absTime += duration;
   }
 
-  void getResult(std::vector<std::pair<ResultMatrix, Weight>> &v) const {
+  void getResult(boost::unordered_map<ResultMatrix, Weight> &v) const {
     v = result;
   }
-  std::vector<std::pair<ResultMatrix, Weight>>& getResultRef()  {
+  boost::unordered_map<ResultMatrix, Weight>& getResultRef()  {
     return result;
   }
 };

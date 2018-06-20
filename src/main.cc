@@ -67,7 +67,7 @@ static inline void QTPM(QuantitativeTimedPatternMatching<SignalVariables, ClockV
     }
     valuation.clear();
 
-    auto result = qtpm.getResultRef();
+    boost::unordered_map<std::array<Bounds, 6>, Weight>& result = qtpm.getResultRef();
     if (!quiet) {
       std::array<Bounds, 6> arr;
       Weight weight;
