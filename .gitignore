@@ -34,6 +34,11 @@
 # Emacs
 *~
 
+# GTAGS
+GPATH
+GRTAGS
+GTAGS
+
 # CMake
 build/
 
