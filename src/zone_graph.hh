@@ -129,7 +129,7 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
   using TA_t = BoostTimedAutomaton<SignalVariables, ClockVariables>;
   using ZG_t = BoostZoneGraph<SignalVariables, ClockVariables, Weight, Value>;
   boost::unordered_map<std::tuple<typename TA_t::vertex_descriptor, bool, DBM::Tuple, std::vector<std::vector<Value>>>, typename ZG_t::vertex_descriptor> toZGState;
-  const double max_constraints = std::max<double>(ceil(duration), boost::get_property(TA, boost::graph_max_constraints));
+  // const double max_constraints = std::max<double>(ceil(duration), boost::get_property(TA, boost::graph_max_constraints));
   const auto num_of_vars = boost::get_property(TA, boost::graph_num_of_vars);
 
   const auto convToKey = [] (BoostZoneGraphState<SignalVariables, ClockVariables, Value> x) {
@@ -148,9 +148,7 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
     // the zone must contain the new clock variable T for the dwell time.
     // we admit > ... + 1 to use this function for timed pattern matching too.
     assert(ZG[v].zone.getNumOfVar() >= num_of_vars + 1);
-    ZG[v].zone.M = Bounds{max_constraints, true};
-    // reset the dwell time here
-    ZG[v].zone.reset(ZG[v].zone.getNumOfVar() - 1);
+    ZG[v].zone.tighten(dwellTimeClockVar, -1, {duration, true});
 
     initStatesZG[v] = initState.second;
     nextConf.push_back(v);
@@ -158,9 +156,10 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
     toZGState[convToKey(initState.first)] = v;
   }
 
-  const auto addEdge = [&toZGState,&ZG,&nextConf,&TA,&cost] (const auto currentZGState, const auto nextTAState, const bool jumpable, const DBM &zone, const std::vector<std::vector<Value>> &nextValuations, const std::vector<std::vector<Value>> &currentValuations) {
+  const auto addEdge = [&toZGState,&ZG,&nextConf,&TA,&cost] (const auto currentZGState, const auto nextTAState, const bool jumpable, const DBM &zone, const std::vector<std::vector<Value>> &nextValuations) {
     auto zgState = toZGState.find(std::make_tuple(nextTAState, jumpable, zone.toTuple(), nextValuations));
     typename ZG_t::edge_descriptor edge;
+
 
     if (zgState != toZGState.end()) {
       // targetStateInZA is already added
@@ -197,7 +196,7 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
       auto taState = ZG[currentZGState].vertex;
       bool jumpable = ZG[currentZGState].jumpable;
       DBM nowZone = ZG[currentZGState].zone;
-      nowZone.tighten(dwellTimeClockVar,-1, {duration, true});
+      nowZone.tighten(dwellTimeClockVar, -1, {duration, true});
 
       if (jumpable) {
         // discrete transition
@@ -228,7 +227,7 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
             nextZone.abstractize();
             nextZone.canonize();
 
-            addEdge(currentZGState, nextTAState, false, nextZone, {}, ZG[currentZGState].valuations);
+            addEdge(currentZGState, nextTAState, false, nextZone, {});
           }
         }        
       } else {
@@ -236,8 +235,9 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
         auto nextValuations = ZG[currentZGState].valuations;
         nextValuations.push_back(valuation);
         nowZone.elapse();
-        nowZone.tighten(dwellTimeClockVar,-1, {duration, true});
-        addEdge(currentZGState, ZG[currentZGState].vertex, true, nowZone, nextValuations, ZG[currentZGState].valuations);
+        nowZone.tighten(dwellTimeClockVar, -1, {duration, true});
+        nowZone.canonize();
+        addEdge(currentZGState, ZG[currentZGState].vertex, true, nowZone, nextValuations);
       }
     }
   }

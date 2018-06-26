@@ -9,6 +9,20 @@
   @brief A class to execute quantitative timed pattern matching
 
   @note This class works in an incremental way.
+
+  @section Notes on the Usage of DBM
+
+  The usage of each cell in the DBM is as follows.
+
+  - 0: x0 == 0
+  - 1-N: x (usual variables)
+  - N+1: the duration from the actual start
+      - i.e., NOW - t
+  - N+2: the dwell time
+      - i.e., $\mathit{NOW} - \tau_i$
+      - should be released at first
+      - THIS SHOULD NOT RESET in zone construction
+
  */
 template<class SignalVariables, class ClockVariables, class Weight, class Value>
 class QuantitativeTimedPatternMatching
@@ -50,7 +64,10 @@ public:
                                    const std::vector<TAState> &initStates,
                                    const std::function<Weight(const std::vector<Constraint<ClockVariables>> &,const std::vector<std::vector<Value>> &)> &cost) : numOfClockVariables(boost::get_property(TA, boost::graph_num_of_vars)), TA(TA), initStates(initStates), cost(cost) {
     DBM z = DBM::zero(numOfClockVariables + 1 + 2);
+    // release Z(N+2)
+    z.M = Bounds(std::numeric_limits<double>::infinity(), false);
     z.release(numOfClockVariables + 2 - 1);
+    z.tighten(-1, numOfClockVariables + 2 - 1, {0, true});
     initialZone = std::move(z);
   }
   /*!
@@ -62,6 +79,7 @@ public:
   void feed(const std::vector<Value> &valuation, const double duration) {
 
     for (auto &c: configuration) {
+      // reset Z(N+2)
       c.first.zone.reset(numOfClockVariables + 2 - 1);
       if (c.first.jumpable) {
         c.first.valuations.push_back(valuation);

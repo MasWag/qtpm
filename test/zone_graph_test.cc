@@ -80,7 +80,11 @@ BOOST_AUTO_TEST_CASE(zoneConstructionWithTTest1)
 
   auto zeroDBM = DBM::zero(num_of_vars + 2);
   const auto max_constraints = boost::get_property(TA, boost::graph_max_constraints);
+  auto DBMDwellTimeVar = num_of_vars + 1 - 1;
+
   zeroDBM.M = Bounds{max_constraints, true};
+  zeroDBM.tighten(-1, DBMDwellTimeVar, {0, true});
+  zeroDBM.release(DBMDwellTimeVar);
 
   BOOST_CHECK_EQUAL(initStatesTA.size(), 1);
   BOOST_CHECK_EQUAL(boost::num_vertices(TA), 3);
@@ -108,9 +112,9 @@ BOOST_AUTO_TEST_CASE(zoneConstructionWithTTest1)
   BOOST_CHECK_EQUAL(initStatesZG.size(), 2);
   BOOST_CHECK_EQUAL(boost::num_vertices(ZG), 8 + 7);
 
-  const std::array<typename BoostTimedAutomaton<SignalVariables, ClockVariables>::vertex_descriptor, 2> expectedInitZGTAStates = {{q0, q1}};
-  const std::array<bool, 2> expectedInitZGBs = {{false, true}};
-  const std::array<std::size_t, 2> expectedInitZGValuationsSize = {{0, 2}};
+  // const std::array<typename BoostTimedAutomaton<SignalVariables, ClockVariables>::vertex_descriptor, 2> expectedInitZGTAStates = {{q0, q1}};
+  // const std::array<bool, 2> expectedInitZGBs = {{false, true}};
+  // const std::array<std::size_t, 2> expectedInitZGValuationsSize = {{0, 2}};
 
   // for (int i = 0; i < 2; i++) {
   //   BOOST_CHECK_EQUAL(ZG[initStatesZG[i].first].vertex, expectedInitZGTAStates[i]);
@@ -138,10 +142,11 @@ BOOST_AUTO_TEST_CASE(zoneConstructionWithTForPatternMatchingTest1)
   BOOST_CHECK_GT(num_of_vars, 0);
 
   auto zeroDBM = DBM::zero(num_of_vars + 3);
-  auto DBMInitVar = num_of_vars;
-  const auto max_constraints = boost::get_property(TA, boost::graph_max_constraints);
-  zeroDBM.M = Bounds{std::numeric_limits<Value>::infinity(), true};
-  zeroDBM.release(DBMInitVar);
+  auto DBMDwellTimeVar = num_of_vars + 2 - 1;
+
+  zeroDBM.M = Bounds{std::numeric_limits<Value>::infinity(), false};
+  zeroDBM.tighten(-1, DBMDwellTimeVar, {0, true});
+  zeroDBM.release(DBMDwellTimeVar);
 
   BOOST_CHECK_EQUAL(initStatesTA.size(), 1);
   BOOST_CHECK_EQUAL(boost::num_vertices(TA), 3);
