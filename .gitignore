@@ -37,3 +37,6 @@
 # CMake
 build/
 
+# Simulink
+experiments/slprj/
+*.mexmaci64
