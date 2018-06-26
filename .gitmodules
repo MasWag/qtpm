@@ -1,0 +1,3 @@
+[submodule "experiments/cruise-control-simulink"]
+	path = experiments/cruise-control-simulink
+	url = git@github.com:ERATOMMSD/cruise-control-simulink.git
