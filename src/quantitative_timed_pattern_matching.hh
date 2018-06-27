@@ -83,6 +83,7 @@ public:
       c.first.zone.reset(numOfClockVariables + 2 - 1);
       if (c.first.jumpable) {
         c.first.valuations.push_back(valuation);
+        c.first.zone.elapse();
       }
     }
 
@@ -110,7 +111,8 @@ public:
     }
 
     for (auto &w: distance) {
-      if (TA[ZG[w.first].vertex].isMatch) {
+      if (TA[ZG[w.first].vertex].isMatch && !ZG[w.first].jumpable
+          ) {
         //        assert(ZG[w.first].zone.isSatisfiable());
         ResultMatrix mat = {{ZG[w.first].zone.value(numOfClockVariables + 2 - 1, numOfClockVariables + 2) - absTime,
                              ZG[w.first].zone.value(numOfClockVariables + 2, numOfClockVariables + 2 - 1) + absTime,

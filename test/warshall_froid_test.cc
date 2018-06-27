@@ -5,19 +5,19 @@
 
 BOOST_AUTO_TEST_SUITE(WarshallFroidTest)
 
-typedef boost::mpl::list<MinPlusSemiring<int>, MaxMinSemiring<int>> testTypesInt;
+typedef boost::mpl::list<MinPlusSemiring<double>, MaxMinSemiring<double>> testTypesInt;
 
 template<class T>
 struct ans_trait;
 
 template<>
-struct ans_trait<MinPlusSemiring<int>> {
-  const static int ans = 2;
+struct ans_trait<MinPlusSemiring<double>> {
+  constexpr const static double ans = 2.0;
 };
 
 template<>
-struct ans_trait<MaxMinSemiring<int>> {
-  const static int ans = 3;
+struct ans_trait<MaxMinSemiring<double>> {
+  constexpr const static double ans = 3.0;
 };
 
 BOOST_AUTO_TEST_CASE_TEMPLATE( warshallFroidTest0, T, testTypesInt )
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( warshallFroidTest0, T, testTypesInt )
 
   warshall_froid(G, distance);
 
-  constexpr int const ans = ans_trait<T>::ans;
+  constexpr auto const ans = ans_trait<T>::ans;
 
   BOOST_CHECK_EQUAL(distance[vs[1]][vs[2]].data, ans);
 }
