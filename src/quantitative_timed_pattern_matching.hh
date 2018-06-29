@@ -38,6 +38,8 @@ private:
   using ZoneGraph = BoostZoneGraph<SignalVariables, ClockVariables, Weight, Value>;
   using ZGState = typename ZoneGraph::vertex_descriptor;
 
+  using ConfTuple_t = std::tuple<TAState, bool, std::vector<std::vector<Value>>, Weight>;
+
   // constants
 
   const std::size_t numOfClockVariables;
@@ -67,7 +69,8 @@ public:
     // release Z(N+2)
     z.M = Bounds(std::numeric_limits<double>::infinity(), false);
     z.release(numOfClockVariables + 2 - 1);
-    z.tighten(-1, numOfClockVariables + 2 - 1, {0, true});
+    z.tightenWithoutClose(-1, numOfClockVariables + 2 - 1, {0, true});
+    z.canonize();
     initialZone = std::move(z);
   }
   /*!
@@ -101,15 +104,58 @@ public:
     bellman_ford<std::queue<ZGState>>(ZG, initStatesZG, distance);
     configuration.clear();
 
+    boost::unordered_map<ConfTuple_t, std::list<DBM>> confMap;
+
     for (auto w: distance) {
       if (!TA[ZG[w.first].vertex].isMatch) {
         auto z = ZG[w.first].zone;
-        z.tighten(-1, numOfClockVariables + 2 - 1, Bounds{-duration, true});
-        z.tighten(numOfClockVariables + 2 - 1, -1, Bounds{duration, true});
+        z.tightenWithoutClose(-1, numOfClockVariables + 2 - 1, Bounds{-duration, true});
+        z.tightenWithoutClose(numOfClockVariables + 2 - 1, -1, Bounds{duration, true});
         if (z.isSatisfiable()) {
-          configuration.emplace_back(BoostZoneGraphState<SignalVariables, ClockVariables, Value>{ZG[w.first].vertex, ZG[w.first].jumpable, z, ZG[w.first].valuations}, w.second);
+          auto it = confMap.find(std::make_tuple(ZG[w.first].vertex, ZG[w.first].jumpable, ZG[w.first].valuations ,w.second));
+          if (it != confMap.end()) {
+          for (DBM &zz: it->second) {
+            if (zz.merge(z)) {
+              goto next;
+            }
+          }
+          it->second.push_back(std::move(z));
+          } else {
+            confMap[std::make_tuple(ZG[w.first].vertex, ZG[w.first].jumpable, ZG[w.first].valuations ,w.second)].push_back(std::move(z));
+          }
         }
       }
+    next:;
+    }
+
+    for (auto &c: confMap) {
+      if (c.second.size() == 1) {
+        configuration.emplace_back(BoostZoneGraphState<SignalVariables, ClockVariables, Value>{std::get<0>(c.first), std::get<1>(c.first), c.second.front(), std::get<2>(c.first)}, std::get<3>(c.first));
+
+      } else {
+        bool removed = true;
+        while (removed) {
+          removed = false;
+          for (auto it = c.second.begin(); it != c.second.end(); it++) {
+            DBM tmp = *it;
+            auto jt = it;
+            for (jt++; jt != c.second.end();) {
+              if (it->merge(*jt)) {
+                jt = c.second.erase(jt);
+                removed = true;
+              } else {
+                jt++;
+              }
+            }
+          }
+        }
+        for (auto &z: c.second) {
+          // for the current check
+          // if (z.value(0,1) >= Bounds{-150, true}) {
+          configuration.emplace_back(BoostZoneGraphState<SignalVariables, ClockVariables, Value>{std::get<0>(c.first), std::get<1>(c.first), std::move(z), std::get<2>(c.first)}, std::get<3>(c.first));
+          // }
+        }
+      }    
     }
 
     for (auto &w: distance) {

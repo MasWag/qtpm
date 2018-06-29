@@ -22,7 +22,7 @@ BrCC.SetInputGen(InputGen);
 
 simTime = 60 * 100
 
-BrCC.Sim(0:.05:simTime);
+BrCC.Sim(0:10.0:simTime);
 figure; 
 BrCC.PlotSignals({'velocity', 'ref_speed'});
 
