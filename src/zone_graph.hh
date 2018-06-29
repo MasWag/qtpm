@@ -224,8 +224,8 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
             for (auto x : TA[edge].resetVars.resetVars) {
               nextZone.reset(x);
             }
-            nextZone.abstractize();
-            nextZone.canonize();
+            // nextZone.abstractize();
+            // nextZone.canonize();
 
             addEdge(currentZGState, nextTAState, false, nextZone, {});
           }
@@ -236,7 +236,7 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
         nextValuations.push_back(valuation);
         nowZone.elapse();
         nowZone.tighten(dwellTimeClockVar, -1, {duration, true});
-        nowZone.canonize();
+        // nowZone.canonize();
         addEdge(currentZGState, ZG[currentZGState].vertex, true, nowZone, nextValuations);
       }
     }

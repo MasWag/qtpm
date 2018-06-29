@@ -52,7 +52,7 @@ struct DBM {
     return value.cols() - 1;
   }
 
-  inline void cutVars (std::shared_ptr<DBM> &out,std::size_t from,std::size_t to) {
+  inline void cutVars (std::shared_ptr<DBM> &out,std::size_t from,std::size_t to) const {
     out = std::make_shared<DBM>();
     out->value.resize(to - from + 2, to - from + 2);
     out->value.block(0,0,1,1) << Bounds(0,true);
@@ -78,6 +78,7 @@ struct DBM {
   }
 
   //! @brief add the constraint x - y \le (c,s) but does not close.
+  //! @note The result is not canonized
   void tightenWithoutClose(uint8_t x, uint8_t y, Bounds c) {
     x++;
     y++;
@@ -96,22 +97,29 @@ struct DBM {
   void close1(uint8_t x) {
     for (int i = 0; i < value.rows(); i++) {
       value.row(i) = value.row(i).array().min(value.row(x).array() + value(i, x));
-      //      for (int j = 0; j < value.cols(); j++) {
-      //        value(i, j) = std::min(value(i, j), value(i, x) + value(x, j));
-      //      }
+      // for (int j = 0; j < value.cols(); j++) {
+      //   value(i, j) = std::min(value(i, j), value(i, x) + value(x, j));
+      // }
     }
   }
   
   // The reset value is always (0, \le)
   void reset(uint8_t x) {
+    // DBM orig = *this;
     // 0 is the special varibale here
     x++;
     value(0,x) = Bounds(0, true);
     value(x,0) = Bounds(0, true);
     value.col(x).tail(value.rows() - 1) = value.col(0).tail(value.rows() - 1);
     value.row(x).tail(value.cols() - 1) = value.row(0).tail(value.cols() - 1);
+    // This close is necessary to keep canonized.
+    close1(x);
+    // if (orig.isCanonized()) {
+    //   assert(isCanonized());
+    // }
   }
   
+  //! @note the result is not canonized
   void release(uint8_t x) {
     static constexpr Bounds infinity = Bounds(std::numeric_limits<double>::infinity(), false);
     // 0 is the special varibale here
@@ -123,11 +131,15 @@ struct DBM {
   }
 
   void elapse() {
+    // DBM orig = *this;
     static constexpr Bounds infinity = Bounds(std::numeric_limits<double>::infinity(), false);
     value.col(0).fill(infinity);
     for (int i = 0; i < value.row(0).size(); ++i) {
       value.row(0)[i].second = false;
     }
+    // if (orig.isCanonized()) {
+    //   assert(isCanonized());
+    // }
   }
 
   void canonize() {
@@ -136,7 +148,7 @@ struct DBM {
     }
   }
 
-  bool isSatisfiableWithoutCanonize() const {
+  inline bool isSatisfiableWithoutCanonize() const {
     return (value + value.transpose()).minCoeff() >= Bounds(0.0, true);
   }
 
@@ -178,8 +190,11 @@ struct DBM {
 
   // @pre getNumOfVar() == z.getNumOfVar() == dest.getNumOfVar()
   //! @brief take convex union
-  void convexUnion(const DBM &z, DBM &dest) {
+  void convexUnion(const DBM &z, DBM &dest) const {
     dest.value.array() = value.array().max(z.value.array());
+    if (isCanonized() && z.isCanonized()) {
+      assert(dest.isCanonized());
+    }
   }
 
   /*!
@@ -223,6 +238,12 @@ struct DBM {
 
     value =  std::move(convex.value);
     return true;
+  }
+
+  bool isCanonized() const {
+    DBM tmp = *this;
+    tmp.canonize();
+    return !tmp.isSatisfiableWithoutCanonize() || value == tmp.value;
   }
 };
 

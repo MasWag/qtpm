@@ -33,6 +33,9 @@ public:
   bool operator!=(const MinPlusSemiring& x) const {
     return data != x.data;
   }
+  bool operator==(const MinPlusSemiring& x) const {
+    return data == x.data;
+  }
   static  MinPlusSemiring zero() {
     static MinPlusSemiring zero = MinPlusSemiring{ std::numeric_limits<Base>::has_infinity ?
                                                    std::numeric_limits<Base>::infinity():  
@@ -47,6 +50,11 @@ public:
     return one();
   }  
 };
+
+template<typename Base>
+std::size_t hash_value(MinPlusSemiring<Base> const& v) {
+  return boost::hash_value(v.data);
+}
 
 template<typename Base>
 class MaxMinSemiring {
@@ -68,6 +76,9 @@ public:
   bool operator!=(const MaxMinSemiring& x) const {
     return data != x.data;
   }
+  bool operator==(const MaxMinSemiring& x) const {
+    return data == x.data;
+  }
   MaxMinSemiring star() const {
     return one();
   }
@@ -84,3 +95,8 @@ public:
     return zero;
   }
 };
+
+template<typename Base>
+std::size_t hash_value(MaxMinSemiring<Base> const& v) {
+  return boost::hash_value(v.data);
+}
