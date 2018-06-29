@@ -1,5 +1,6 @@
 #pragma once
 // (setq flycheck-clang-language-standard "c++14")
+#include <iostream>
 #include <cmath>
 #include <limits>
 #include <algorithm>
@@ -76,6 +77,13 @@ struct DBM {
     return std::tuple<std::vector<Bounds>,Bounds>(std::vector<Bounds>(value.data() + 1, value.data() + value.size()),M);
   }
 
+  //! @brief add the constraint x - y \le (c,s) but does not close.
+  void tightenWithoutClose(uint8_t x, uint8_t y, Bounds c) {
+    x++;
+    y++;
+    value(x,y) = std::min(value(x, y), c);
+  }
+
   //! @brief add the constraint x - y \le (c,s)
   void tighten(uint8_t x, uint8_t y, Bounds c) {
     x++;
@@ -128,9 +136,13 @@ struct DBM {
     }
   }
 
+  bool isSatisfiableWithoutCanonize() const {
+    return (value + value.transpose()).minCoeff() >= Bounds(0.0, true);
+  }
+
   bool isSatisfiable() {
     canonize();
-    return (value + value.transpose()).minCoeff() >= Bounds(0.0, true);
+    return isSatisfiableWithoutCanonize();
   }
 
   void abstractize() {
@@ -156,6 +168,62 @@ struct DBM {
     canonize();
   }
 
+  bool operator>(const DBM &z) const {
+    return (value.array() > z.value.array()).all();
+  }
+
+  bool operator<=(const DBM &z) const {
+    return !isSatisfiableWithoutCanonize() || (value.array() <= z.value.array()).all();
+  }
+
+  // @pre getNumOfVar() == z.getNumOfVar() == dest.getNumOfVar()
+  //! @brief take convex union
+  void convexUnion(const DBM &z, DBM &dest) {
+    dest.value.array() = value.array().max(z.value.array());
+  }
+
+  /*!
+    @brief try merging the given DBM to this DBM
+    @retval true when the merging succeeded
+    @retval false when the merging did not succeed
+  */
+  bool merge(const DBM &z) {
+    if (*this <= z) {
+      value = std::move(z.value);
+      return true;
+    }
+    if (z <= *this) {
+      return true;
+    }
+
+    // take the convex union
+    DBM convex = DBM::zero(getNumOfVar()+ 1);
+    convexUnion(z, convex);
+    std::size_t N = value.cols();
+    for (std::size_t i = 0; i < N; i++) {
+      for (std::size_t j = 0; j < N; j++) {
+        // we do not have to look at the diags
+        if (i == j) {
+          continue;
+        }
+        const Bounds rev = {-value(j,i).first, !value(j,i).second};
+        // When we do not have to tighten, we skip
+        if (convex.value(i,j) <= rev) {
+          continue;
+        }
+        DBM c = convex;
+        c.value(i,j) = rev;
+        c.close1(i);
+        c.close1(j);
+        if (!(c <= z)) {
+          return false;
+        }
+      }
+    }
+
+    value =  std::move(convex.value);
+    return true;
+  }
 };
 
 // struct ZoneAutomaton : public AbstractionAutomaton<DBM> {
