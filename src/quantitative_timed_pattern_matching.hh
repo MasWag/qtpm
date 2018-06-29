@@ -102,17 +102,18 @@ public:
     configuration.clear();
 
     for (auto w: distance) {
-      auto z = ZG[w.first].zone;
-      z.tighten(-1, numOfClockVariables + 2 - 1, Bounds{-duration, true});
-      z.tighten(numOfClockVariables + 2 - 1, -1, Bounds{duration, true});
-      if (z.isSatisfiable()) {
-        configuration.emplace_back(BoostZoneGraphState<SignalVariables, ClockVariables, Value>{ZG[w.first].vertex, ZG[w.first].jumpable, z, ZG[w.first].valuations}, w.second);
+      if (!TA[ZG[w.first].vertex].isMatch) {
+        auto z = ZG[w.first].zone;
+        z.tighten(-1, numOfClockVariables + 2 - 1, Bounds{-duration, true});
+        z.tighten(numOfClockVariables + 2 - 1, -1, Bounds{duration, true});
+        if (z.isSatisfiable()) {
+          configuration.emplace_back(BoostZoneGraphState<SignalVariables, ClockVariables, Value>{ZG[w.first].vertex, ZG[w.first].jumpable, z, ZG[w.first].valuations}, w.second);
+        }
       }
     }
 
     for (auto &w: distance) {
-      if (TA[ZG[w.first].vertex].isMatch && !ZG[w.first].jumpable
-          ) {
+      if (TA[ZG[w.first].vertex].isMatch && !ZG[w.first].jumpable) {
         //        assert(ZG[w.first].zone.isSatisfiable());
         ResultMatrix mat = {{ZG[w.first].zone.value(numOfClockVariables + 2 - 1, numOfClockVariables + 2) - absTime,
                              ZG[w.first].zone.value(numOfClockVariables + 2, numOfClockVariables + 2 - 1) + absTime,
