@@ -128,16 +128,17 @@ public:
     next:;
     }
 
+    std::cerr << confMap.size() << " ";
+
+    auto start = std::chrono::system_clock::now();    
     for (auto &c: confMap) {
       if (c.second.size() == 1) {
-        configuration.emplace_back(BoostZoneGraphState<SignalVariables, ClockVariables, Value>{std::get<0>(c.first), std::get<1>(c.first), c.second.front(), std::get<2>(c.first)}, std::get<3>(c.first));
-
+        configuration.emplace_back(BoostZoneGraphState<SignalVariables, ClockVariables, Value>{std::get<0>(c.first), std::get<1>(c.first), std::move(c.second.front()), std::get<2>(c.first)}, std::get<3>(c.first));
       } else {
         bool removed = true;
         while (removed) {
           removed = false;
           for (auto it = c.second.begin(); it != c.second.end(); it++) {
-            DBM tmp = *it;
             auto jt = it;
             for (jt++; jt != c.second.end();) {
               if (it->merge(*jt)) {
@@ -154,6 +155,12 @@ public:
         }
       }    
     }
+
+    auto end = std::chrono::system_clock::now();
+    auto dur = end - start;
+    auto nsec = std::chrono::duration_cast<std::chrono::nanoseconds>(dur).count();
+    std::cerr << "parse TRE: " << nsec / 1000000.0 << " ms" << std::endl;
+    std::cerr << configuration.size()  << std::endl;
 
     for (auto &w: distance) {
       if (TA[ZG[w.first].vertex].isMatch && !ZG[w.first].jumpable) {
