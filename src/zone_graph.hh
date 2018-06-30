@@ -145,9 +145,13 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
     ZG[v] = initState.first;
     // the zone must contain the new clock variable T for the dwell time.
     // we admit > ... + 1 to use this function for timed pattern matching too.
+#ifdef DEBUG
     assert(ZG[v].zone.getNumOfVar() >= num_of_vars + 1);
+#endif
     ZG[v].zone.tighten(dwellTimeClockVar, -1, {duration, true});
+#ifdef DEBUG
     assert(ZG[v].zone.value.cols() == 4);
+#endif
 
     initStatesZG[v] = initState.second;
     nextConf.push_back(v);
@@ -161,8 +165,9 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
 
                          const bool isNew = zgState == toZGState.end();
 
+#ifdef DEBUG
                          assert(zone.value.cols() == 4);
-
+#endif
                          if (!isNew) {
                            // targetStateInZA is already added
                            // TODO: we can merge some edges
@@ -179,8 +184,10 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
                            if (!jumpable) {
                              nextConf.push_back (nextZGState);
                            }
+#ifdef DEBUG
                            assert(ZG[nextZGState].zone.value.cols() == 4);
                            assert((toZGState.find(convToKey(ZG[nextZGState])) != toZGState.end()));
+#endif
                          }
 
                          if (!jumpable) {
@@ -207,7 +214,9 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
         // when the vertex does not exist
         continue;
       }
+#ifdef DEBUG
       assert(nowZone.value.cols() == 4);
+#endif
 
       nowZone.tighten(dwellTimeClockVar, -1, {duration, true});
 
