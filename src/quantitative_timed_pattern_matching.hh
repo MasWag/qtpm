@@ -107,11 +107,12 @@ public:
     boost::unordered_map<ConfTuple_t, std::list<DBM>> confMap;
 
     for (auto w: distance) {
-      if (!TA[ZG[w.first].vertex].isMatch) {
+      if (!TA[ZG[w.first].vertex].isMatch && ZG[w.first].zone.value.cols() > 0) {
         auto z = ZG[w.first].zone;
         z.tightenWithoutClose(-1, numOfClockVariables + 2 - 1, Bounds{-duration, true});
         z.tightenWithoutClose(numOfClockVariables + 2 - 1, -1, Bounds{duration, true});
         if (z.isSatisfiable()) {
+
           auto it = confMap.find(std::make_tuple(ZG[w.first].vertex, ZG[w.first].jumpable, ZG[w.first].valuations ,w.second));
           if (it != confMap.end()) {
           for (DBM &zz: it->second) {
@@ -151,15 +152,13 @@ public:
         }
         for (auto &z: c.second) {
           // for the current check
-          // if (z.value(0,1) >= Bounds{-150, true}) {
           configuration.emplace_back(BoostZoneGraphState<SignalVariables, ClockVariables, Value>{std::get<0>(c.first), std::get<1>(c.first), std::move(z), std::get<2>(c.first)}, std::get<3>(c.first));
-          // }
         }
-      }    
+      }
     }
 
     for (auto &w: distance) {
-      if (TA[ZG[w.first].vertex].isMatch && !ZG[w.first].jumpable) {
+      if (TA[ZG[w.first].vertex].isMatch && !ZG[w.first].jumpable && ZG[w.first].zone.value.cols() > 0) {
         //        assert(ZG[w.first].zone.isSatisfiable());
         ResultMatrix mat = {{ZG[w.first].zone.value(numOfClockVariables + 2 - 1, numOfClockVariables + 2) - absTime,
                              ZG[w.first].zone.value(numOfClockVariables + 2, numOfClockVariables + 2 - 1) + absTime,

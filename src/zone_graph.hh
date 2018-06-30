@@ -117,7 +117,7 @@ void zoneConstruction(const BoostTimedAutomaton<SignalVariables, ClockVariables>
   @param [in] duartion A length of the signal
   @param [out] ZG The zone graph with weight.
   @param [out] initStatesZG The initial states of the zone graph.
- */
+*/
 template<class SignalVariables, class ClockVariables, class Weight, class Value>
 void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVariables> &TA,
                            const std::vector<std::pair<BoostZoneGraphState<SignalVariables, ClockVariables, Value>, Weight>> &initConfTA,
@@ -128,6 +128,7 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
                            std::unordered_map<typename BoostZoneGraph<SignalVariables, ClockVariables, Weight, Value>::vertex_descriptor,Weight> &initStatesZG) {
   using TA_t = BoostTimedAutomaton<SignalVariables, ClockVariables>;
   using ZG_t = BoostZoneGraph<SignalVariables, ClockVariables, Weight, Value>;
+  using TAState = typename TA_t::vertex_descriptor;
   boost::unordered_map<std::tuple<typename TA_t::vertex_descriptor, bool, DBM::Tuple, std::vector<std::vector<Value>>>, typename ZG_t::vertex_descriptor> toZGState;
   // const double max_constraints = std::max<double>(ceil(duration), boost::get_property(TA, boost::graph_max_constraints));
   const auto num_of_vars = boost::get_property(TA, boost::graph_num_of_vars);
@@ -141,51 +142,56 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
   nextConf.reserve(initConfTA.size());
   for (const auto &initState: initConfTA) {
     auto v = boost::add_vertex(ZG);
-    ZG[v].vertex = initState.first.vertex;
-    ZG[v].jumpable = initState.first.jumpable;
-    ZG[v].zone = initState.first.zone;
-    ZG[v].valuations = initState.first.valuations;
+    ZG[v] = initState.first;
     // the zone must contain the new clock variable T for the dwell time.
     // we admit > ... + 1 to use this function for timed pattern matching too.
     assert(ZG[v].zone.getNumOfVar() >= num_of_vars + 1);
     ZG[v].zone.tighten(dwellTimeClockVar, -1, {duration, true});
+    assert(ZG[v].zone.value.cols() == 4);
 
     initStatesZG[v] = initState.second;
     nextConf.push_back(v);
 
-    toZGState[convToKey(initState.first)] = v;
+    toZGState[convToKey(ZG[v])] = v;
   }
 
-  const auto addEdge = [&toZGState,&ZG,&nextConf,&TA,&cost] (const auto currentZGState, const auto nextTAState, const bool jumpable, const DBM &zone, const std::vector<std::vector<Value>> &nextValuations) {
-    auto zgState = toZGState.find(std::make_tuple(nextTAState, jumpable, zone.toTuple(), nextValuations));
-    typename ZG_t::edge_descriptor edge;
+  const auto addEdge = [&toZGState,&ZG,&nextConf,&TA,&cost,&convToKey] (const auto currentZGState, const auto nextTAState, const bool jumpable, const DBM &zone, const std::vector<std::vector<Value>> &nextValuations) -> bool {
+                         auto zgState = toZGState.find(std::make_tuple(nextTAState, jumpable, zone.toTuple(), nextValuations));
+                         typename ZG_t::edge_descriptor edge;
 
+                         const bool isNew = zgState == toZGState.end();
 
-    if (zgState != toZGState.end()) {
-      // targetStateInZA is already added
-      // TODO: we can merge some edges
-      edge = std::get<0>(boost::add_edge(currentZGState, zgState->second, ZG));
+                         assert(zone.value.cols() == 4);
 
-    } else {
-      // targetStateInZA is new
-      auto nextZGState = boost::add_vertex(ZG);
-      ZG[nextZGState].vertex = nextTAState;
-      ZG[nextZGState].jumpable = jumpable;
-      ZG[nextZGState].zone = zone;
-      ZG[nextZGState].valuations = nextValuations;
-      toZGState[std::make_tuple(nextTAState, jumpable, zone.toTuple(), nextValuations)] = nextZGState;
-      edge = std::get<0>(boost::add_edge(currentZGState, nextZGState, ZG));
+                         if (!isNew) {
+                           // targetStateInZA is already added
+                           // TODO: we can merge some edges
+                           edge = std::get<0>(boost::add_edge(currentZGState, zgState->second, ZG));
+                         } else {
+                           // targetStateInZA is new
+                           auto nextZGState = boost::add_vertex(ZG);
+                           ZG[nextZGState].vertex = nextTAState;
+                           ZG[nextZGState].jumpable = jumpable;
+                           ZG[nextZGState].zone = zone;
+                           ZG[nextZGState].valuations = nextValuations;
+                           toZGState[convToKey(ZG[nextZGState])] = nextZGState;
+                           edge = std::get<0>(boost::add_edge(currentZGState, nextZGState, ZG));
+                           if (!jumpable) {
+                             nextConf.push_back (nextZGState);
+                           }
+                           assert(ZG[nextZGState].zone.value.cols() == 4);
+                           assert((toZGState.find(convToKey(ZG[nextZGState])) != toZGState.end()));
+                         }
 
-      nextConf.push_back (nextZGState);
-    }
+                         if (!jumpable) {
+                           boost::put(boost::edge_weight, ZG, edge, cost(TA[ZG[currentZGState].vertex].label,
+                                                                         ZG[currentZGState].valuations));
+                         } else {
+                           boost::put(boost::edge_weight, ZG, edge, Weight::one());
+                         }
 
-    if (!jumpable) {
-      boost::put(boost::edge_weight, ZG, edge, cost(TA[ZG[currentZGState].vertex].label,
-                                                    ZG[currentZGState].valuations));
-    } else {
-      boost::put(boost::edge_weight, ZG, edge, Weight::one());
-    }
-  };
+                         return isNew;
+                       };
 
 
   while (!nextConf.empty()) {
@@ -196,48 +202,120 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
       auto taState = ZG[currentZGState].vertex;
       bool jumpable = ZG[currentZGState].jumpable;
       DBM nowZone = ZG[currentZGState].zone;
+
+      if (nowZone.value.cols() == 0) {
+        // when the vertex does not exist
+        continue;
+      }
+      assert(nowZone.value.cols() == 4);
+
       nowZone.tighten(dwellTimeClockVar, -1, {duration, true});
+
+      const auto listDiscreteTransitions =
+        [&TA,&taState] (const DBM& nowZone, std::vector<std::pair<TAState, DBM>> &v) {
+          // discrete transition
+          for (auto range = boost::out_edges(taState, TA); range.first != range.second; range.first++) {
+            const auto edge = *range.first;
+            DBM nextZone = nowZone;
+            auto nextTAState = boost::target(edge, TA);
+
+            const auto guard = TA[edge].guard;
+            for (const auto &delta : guard) {
+              switch (delta.odr) {
+              case Constraint<ClockVariables>::Order::lt:
+                nextZone.tightenWithoutClose(delta.x,-1,{delta.c, false});
+              case Constraint<ClockVariables>::Order::le:
+                nextZone.tightenWithoutClose(delta.x,-1,{delta.c, true});
+                break;
+              case Constraint<ClockVariables>::Order::gt:
+                nextZone.tightenWithoutClose(-1,delta.x,{-delta.c, false});
+              case Constraint<ClockVariables>::Order::ge:
+                nextZone.tightenWithoutClose(-1,delta.x,{-delta.c, true});
+              }
+            }
+
+            if (nextZone.isSatisfiable()) {
+              for (auto x : TA[edge].resetVars.resetVars) {
+                nextZone.reset(x);
+              }
+
+              v.emplace_back(nextTAState, nextZone);
+            }
+          }
+        };
 
       if (jumpable) {
         // discrete transition
-        for (auto range = boost::out_edges(taState, TA); range.first != range.second; range.first++) {
-          const auto edge = *range.first;
-          DBM nextZone = nowZone;
-          auto nextTAState = boost::target(edge, TA);
+        std::vector<std::pair<TAState, DBM>> nextTAStates;
+        listDiscreteTransitions(nowZone, nextTAStates);
 
-          const auto guard = TA[edge].guard;
-          for (const auto &delta : guard) {
-            switch (delta.odr) {
-            case Constraint<ClockVariables>::Order::lt:
-              nextZone.tighten(delta.x,-1,{delta.c, false});
-            case Constraint<ClockVariables>::Order::le:
-              nextZone.tighten(delta.x,-1,{delta.c, true});
-              break;
-            case Constraint<ClockVariables>::Order::gt:
-              nextZone.tighten(-1,delta.x,{-delta.c, false});
-            case Constraint<ClockVariables>::Order::ge:
-              nextZone.tighten(-1,delta.x,{-delta.c, true});
+        if (nextTAStates.empty()) {
+          // If there is no out going transition, it checks if there is a transition later.
+          auto futureZone = nowZone;
+          futureZone.elapse();
+          std::vector<std::pair<TAState, DBM>> futureTAStates;
+          listDiscreteTransitions(nowZone, futureTAStates);
+          // If there is no transition in the future, the current state is useless and we remove it.
+          if (futureTAStates.empty()) {
+            const auto nextZGStateP = toZGState.find(convToKey(ZG[currentZGState]));
+            if (nextZGStateP != toZGState.end()) {
+              clear_vertex(nextZGStateP->second, ZG);
+              remove_vertex(nextZGStateP->second, ZG);
+              toZGState.erase(nextZGStateP);
             }
           }
+          continue;
+        }
+        for (auto &p: nextTAStates) {
+          addEdge(currentZGState, std::move(p.first), false, std::move(p.second), {});
+        }
 
-          if (nextZone.isSatisfiable()) {
-            for (auto x : TA[edge].resetVars.resetVars) {
-              nextZone.reset(x);
-            }
-            // nextZone.abstractize();
-            // nextZone.canonize();
-
-            addEdge(currentZGState, nextTAState, false, nextZone, {});
-          }
-        }        
       } else {
         // continuous transition
         auto nextValuations = ZG[currentZGState].valuations;
+
         nextValuations.push_back(valuation);
         nowZone.elapse();
         nowZone.tighten(dwellTimeClockVar, -1, {duration, true});
+        if (!nowZone.isSatisfiableWithoutCanonize()) {
+          continue;
+        }
+
+        std::vector<std::pair<TAState, DBM>> nextTAStates;
+        listDiscreteTransitions(nowZone, nextTAStates);
+        // We add the state only if it has a next state
+
+        if (!nextTAStates.empty()) {
+          bool isNew = addEdge(currentZGState, ZG[currentZGState].vertex, true, nowZone, nextValuations);
+          if (isNew) {
+            const auto nextZGStateP = toZGState.find(std::make_tuple(ZG[currentZGState].vertex, true, nowZone.toTuple(), nextValuations));
+            for (auto &p: nextTAStates) {
+              addEdge(nextZGStateP->second, std::move(p.first), false, std::move(p.second), {});
+            }
+          }
+        } else {
+          // if the state is accepting, the state is useful even if it has no outgoing transition.
+          if (TA[ZG[currentZGState].vertex].isMatch) {
+            continue;
+          }            
+          // If there is no out going transition, it checks if there is a transition later.
+          auto futureZone = nowZone;
+          futureZone.elapse();
+          std::vector<std::pair<TAState, DBM>> futureTAStates;
+          listDiscreteTransitions(nowZone, futureTAStates);
+          // If there is no transition in the future, the current state is useless and we remove it.
+          if (futureTAStates.empty()) {
+            const auto nextZGStateP = toZGState.find(convToKey(ZG[currentZGState]));
+            // If we cannot go out and the state already exists, we remove the state.
+            if (nextZGStateP != toZGState.end()) {
+              clear_vertex(nextZGStateP->second, ZG);
+              remove_vertex(nextZGStateP->second, ZG);
+              toZGState.erase(nextZGStateP);
+            }
+          }
+        }
+
         // nowZone.canonize();
-        addEdge(currentZGState, ZG[currentZGState].vertex, true, nowZone, nextValuations);
       }
     }
   }
