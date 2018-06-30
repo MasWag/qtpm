@@ -45,3 +45,4 @@ build/
 # Simulink
 experiments/slprj/
 *.mexmaci64
+*.slxc

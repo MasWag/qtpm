@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(zoneConstructionWithTTest1)
 
   // TODO: write some tests
   BOOST_CHECK_EQUAL(initStatesZG.size(), 2);
-  BOOST_CHECK_EQUAL(boost::num_vertices(ZG), 8 + 7);
+  BOOST_CHECK_EQUAL(boost::num_vertices(ZG), 7 + 6);
 
   // const std::array<typename BoostTimedAutomaton<SignalVariables, ClockVariables>::vertex_descriptor, 2> expectedInitZGTAStates = {{q0, q1}};
   // const std::array<bool, 2> expectedInitZGBs = {{false, true}};
@@ -172,7 +172,7 @@ BOOST_AUTO_TEST_CASE(zoneConstructionWithTForPatternMatchingTest1)
 
   // TODO: write some tests
   BOOST_CHECK_EQUAL(initStatesZG.size(), 2);
-  BOOST_CHECK_EQUAL(boost::num_vertices(ZG), 8 + 7);
+  BOOST_CHECK_EQUAL(boost::num_vertices(ZG), 7 + 6);
 
   // const std::array<typename BoostTimedAutomaton<SignalVariables, ClockVariables>::vertex_descriptor, 2> expectedInitZGTAStates = {{q0, q1}};
   // const std::array<bool, 2> expectedInitZGBs = {{false, true}};

@@ -131,7 +131,9 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
   using TAState = typename TA_t::vertex_descriptor;
   boost::unordered_map<std::tuple<typename TA_t::vertex_descriptor, bool, DBM::Tuple, std::vector<std::vector<Value>>>, typename ZG_t::vertex_descriptor> toZGState;
   // const double max_constraints = std::max<double>(ceil(duration), boost::get_property(TA, boost::graph_max_constraints));
+#ifdef DEBUG
   const auto num_of_vars = boost::get_property(TA, boost::graph_num_of_vars);
+#endif
 
   const auto convToKey = [] (BoostZoneGraphState<SignalVariables, ClockVariables, Value> x) {
                            return std::make_tuple(x.vertex, x.jumpable, x.zone.toTuple(), x.valuations);
@@ -149,9 +151,6 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
     assert(ZG[v].zone.getNumOfVar() >= num_of_vars + 1);
 #endif
     ZG[v].zone.tighten(dwellTimeClockVar, -1, {duration, true});
-#ifdef DEBUG
-    assert(ZG[v].zone.value.cols() == 4);
-#endif
 
     initStatesZG[v] = initState.second;
     nextConf.push_back(v);
@@ -165,9 +164,6 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
 
                          const bool isNew = zgState == toZGState.end();
 
-#ifdef DEBUG
-                         assert(zone.value.cols() == 4);
-#endif
                          if (!isNew) {
                            // targetStateInZA is already added
                            // TODO: we can merge some edges
@@ -185,7 +181,6 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
                              nextConf.push_back (nextZGState);
                            }
 #ifdef DEBUG
-                           assert(ZG[nextZGState].zone.value.cols() == 4);
                            assert((toZGState.find(convToKey(ZG[nextZGState])) != toZGState.end()));
 #endif
                          }
@@ -214,9 +209,6 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
         // when the vertex does not exist
         continue;
       }
-#ifdef DEBUG
-      assert(nowZone.value.cols() == 4);
-#endif
 
       nowZone.tighten(dwellTimeClockVar, -1, {duration, true});
 
