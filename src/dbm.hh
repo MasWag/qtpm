@@ -117,9 +117,9 @@ struct DBM {
   void elapse() {
     static constexpr Bounds infinity = Bounds(std::numeric_limits<double>::infinity(), false);
     value.col(0).fill(infinity);
-    // for (int i = 0; i < value.row(0).size(); ++i) {
-    //   value.row(0)[i].second = false;
-    // }
+    for (int i = 0; i < value.row(0).size(); ++i) {
+      value.row(0)[i].second = false;
+    }
   }
 
   void canonize() {
