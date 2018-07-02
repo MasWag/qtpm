@@ -21,7 +21,7 @@ InputGen.SetParam({'SpeedRef_base_value', 'SpeedRef_pulse_period', ...
 BrCC.SetInputGen(InputGen);
 
 for t =  1:10
-    simTime = 60 * 100 * t;
+    simTime = 60 * 1000 * t;
     
     tmp = BrCC.copy;
     tmp.Sim(0:10.0:simTime);
