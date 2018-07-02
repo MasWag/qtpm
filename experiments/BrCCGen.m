@@ -20,17 +20,19 @@ InputGen.SetParam({'SpeedRef_base_value', 'SpeedRef_pulse_period', ...
 
 BrCC.SetInputGen(InputGen);
 
-simTime = 60 * 100
+for t =  1:10
+    simTime = 60 * 100 * t;
+    
+    tmp = BrCC.copy;
+    tmp.Sim(0:10.0:simTime);
+    figure; 
+    tmp.PlotSignals({'velocity', 'ref_speed'});
 
-BrCC.Sim(0:10.0:simTime);
-figure; 
-BrCC.PlotSignals({'velocity', 'ref_speed'});
-
-dlmwrite(sprintf('BrCCPulse-%d.tsv', simTime), ...
-         vertcat(BrCC.P.traj{1,1}.time, BrCC.P.traj{1,1}.X(6,:), ...
-                 BrCC.P.traj{1,1}.X(3,:), abs(BrCC.P.traj{1,1}.X(6,:) ...
-                                              - BrCC.P.traj{1,1}.X(3,:)))','delimiter', '\t','precision', 10);
-
+    dlmwrite(sprintf('BrCCPulse-%d.tsv', simTime), ...
+             vertcat(tmp.P.traj{1,1}.time, tmp.P.traj{1,1}.X(6,:), ...
+                     tmp.P.traj{1,1}.X(3,:), abs(tmp.P.traj{1,1}.X(6,:) ...
+                                                  - tmp.P.traj{1,1}.X(3,:)))','delimiter', '\t','precision', 10);
+end
 % BrCC.P.traj{1,1}.X(1:2,:)
 % vertcat(BrCC.P.traj{1,1}.time, BrCC.P.traj{1,1}.X(1:2,:))
 % [BrCC.P.traj{1,1}.time', BrCC.P.traj{1,1}.X(1:2,:)']'
