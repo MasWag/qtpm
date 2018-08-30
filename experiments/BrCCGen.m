@@ -50,6 +50,9 @@ for t =  1:10
     
     tmp = BrCC.copy;
     %%
+    % set Kp to 0.1 to make the system less stable
+    tmp.SetParam('Kp', 0.1);
+    %%
     % It samples the data every 10 unit time (ms ?) and finish the
     % execution after 60 * 1000 * t unit time
     tmp.Sim(0:10.0:simTime);
@@ -58,7 +61,7 @@ for t =  1:10
 
     %%
     % It writes the log to a tsv file.
-    dlmwrite(sprintf('BrCCPulse-%d.tsv', simTime), ...
+    dlmwrite(sprintf('./data/10.0/BrCCPulse-%d.tsv', simTime), ...
              vertcat(tmp.P.traj{1,1}.time, tmp.P.traj{1,1}.X(6,:), ...
                      tmp.P.traj{1,1}.X(3,:), abs(tmp.P.traj{1,1}.X(6,:) ...
                                                   - tmp.P.traj{1,1}.X(3,:)))','delimiter', '\t','precision', 10);
