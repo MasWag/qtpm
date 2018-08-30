@@ -3,7 +3,7 @@
 #include <boost/graph/adjacency_list.hpp>
 
 template<typename Weight>
-using WeightedGraph = boost::adjacency_list<boost::listS, boost::vecS, boost::directedS, boost::no_property, boost::property<boost::edge_weight_t, Weight>>;
+using WeightedGraph = boost::adjacency_list<boost::listS, boost::listS, boost::directedS, boost::no_property, boost::property<boost::edge_weight_t, Weight>>;
 
 template<typename Base>
 class MinPlusSemiring {
@@ -95,6 +95,11 @@ public:
     return zero;
   }
 };
+
+template<class Base>
+std::ostream& operator<<(std::ostream& os, const MaxMinSemiring<Base>& s) {
+  os << s.data;
+}
 
 template<typename Base>
 std::size_t hash_value(MaxMinSemiring<Base> const& v) {

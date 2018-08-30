@@ -99,9 +99,16 @@ public:
     ZoneGraph ZG;
     std::unordered_map<ZGState, Weight> initStatesZG;
     zoneConstructionWithT(TA, configuration, cost, valuation, duration, ZG, initStatesZG);
+#ifdef DEBUG
+    assert(std::none_of(initStatesZG.begin(), initStatesZG.end(), [&](auto p) {
+          return TA[ZG[p.first].vertex].isMatch;
+        }));
+#endif
 
     std::unordered_map<ZGState, Weight> distance;
     bellman_ford<std::queue<ZGState>>(ZG, initStatesZG, distance);
+    // This does not work when VerticesList is ListS. I do not know why.
+    // write_graphviz(std::cerr, ZG, makeZoneGraphLabelWriter(ZG, TA, distance),make_weight_label_writer(ZG));
     configuration.clear();
 
     boost::unordered_map<ConfTuple_t, std::list<DBM>> confMap;
