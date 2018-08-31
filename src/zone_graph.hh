@@ -205,10 +205,22 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
 
 
   while (!nextConf.empty()) {
+#ifdef DEBUG
+    assert(std::all_of(nextConf.begin(), nextConf.end(), [&ZG](auto p) {
+          return boost::algorithm::any_of_equal(boost::vertices(ZG), p);}));
+#endif
     auto currentConf = std::move(nextConf);
     nextConf.clear();
+    std::unordered_set<typename decltype(currentConf)::value_type> removedVertices;
 
     for (const auto &currentZGState : currentConf) {
+      // OPTIMIZATION: This find is unnecessary if currentConf is std::list (I can remove an element during its iteration)
+      if (removedVertices.find(currentZGState) != removedVertices.end()) {
+        continue;
+      }
+#ifdef DEBUG
+      assert(boost::algorithm::any_of_equal(boost::vertices(ZG), currentZGState));
+#endif
       auto taState = ZG[currentZGState].vertex;
       bool jumpable = ZG[currentZGState].jumpable;
       DBM nowZone = ZG[currentZGState].zone;
@@ -271,6 +283,7 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
               initStatesZG.erase(nextZGStateP->second);
               clear_vertex(nextZGStateP->second, ZG);
               remove_vertex(nextZGStateP->second, ZG);
+              removedVertices.insert(nextZGStateP->second);
               toZGState.erase(nextZGStateP);
             }
 #ifdef DEBUG
@@ -329,6 +342,7 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
               initStatesZG.erase(nextZGStateP->second);
               clear_vertex(nextZGStateP->second, ZG);
               remove_vertex(nextZGStateP->second, ZG);
+              removedVertices.insert(nextZGStateP->second);
               toZGState.erase(nextZGStateP);
             }
           }
@@ -361,6 +375,10 @@ void zoneConstructionWithT(const BoostTimedAutomaton<SignalVariables, ClockVaria
                            return boost::algorithm::any_of_equal(boost::vertices(ZG), p.first);
         }));
 #endif
+    // remove the removedVertices from nextConf
+    nextConf.erase(std::remove_if(nextConf.begin(), nextConf.end(), [&removedVertices](auto v) {
+          return boost::algorithm::any_of_equal(removedVertices, v);
+        }), nextConf.end());
   }
 }
 
