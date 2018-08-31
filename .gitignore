@@ -46,3 +46,10 @@ build/
 experiments/slprj/
 *.mexmaci64
 *.slxc
+
+# Generated Documents
+experiments/html/
+
+# Experments data
+experiments/data
+experiments/log

@@ -1,0 +1,12 @@
+digraph G {
+        rise [label="{x3 > 10}"][init=1][match=0];
+        afterrise [init=0][match=0];
+        fall [label="{x3 < -10}"][init=0][match=0];
+        afterfall [init=0][match=0];
+        fin [init=0][match=1];
+        rise->afterrise [guard="{x0 < 20, x1 < 80}"];
+        afterrise->fall [guard="{x0 < 20, x1 < 80}"];
+        fall->afterfall [guard="{x0 < 20, x1 < 80}"][reset="{0}"];
+        afterfall->rise [guard="{x0 < 20, x1 < 80}"];
+        fall->fin [guard="{x0 < 20, x1 < 80}"];
+}
