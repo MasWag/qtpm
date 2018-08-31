@@ -1,8 +1,36 @@
+#include <boost/algorithm/cxx11/any_of.hpp>
 #include <boost/test/unit_test.hpp>
 #include <array>
 #include "../src/zone_graph.hh"
 #include "../src/robustness.hh"
 #include "../src/weighted_graph.hh"
+
+BOOST_AUTO_TEST_SUITE(zoneGraphRemoveVertexTestSuite)
+BOOST_AUTO_TEST_CASE(zoneGraphRemoveVertexStableTest)
+{
+  using SignalVariables = uint8_t;
+  using ClockVariables = uint8_t;
+  using Weight = MaxMinSemiring<double>;
+  using Value = double;
+  BoostZoneGraph<SignalVariables, ClockVariables, Weight, Value> ZG;
+
+  std::unordered_set<typename BoostZoneGraph<SignalVariables, ClockVariables, Weight, Value>::vertex_descriptor> verticesSet;
+  for (int i = 0; i < 2; i++) {
+    verticesSet.insert(add_vertex(ZG));
+  }
+
+  BOOST_TEST(std::all_of(verticesSet.begin(), verticesSet.end(), [&ZG](auto v) {
+        return boost::algorithm::any_of_equal(boost::vertices(ZG), v);
+      }));
+  auto it = ++verticesSet.begin();
+  boost::remove_vertex(*it, ZG);
+  verticesSet.erase(it);
+  BOOST_TEST(std::all_of(verticesSet.begin(), verticesSet.end(), [&ZG](auto v) {
+        return boost::algorithm::any_of_equal(boost::vertices(ZG), v);
+      }));
+}
+BOOST_AUTO_TEST_SUITE_END()
+
 
 BOOST_AUTO_TEST_SUITE(zoneConstructionTest)
 
