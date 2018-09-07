@@ -9,7 +9,7 @@ fi
 gnuplot <<EOF
 set terminal tikz
 set output "$2"
-set xlabel 'Length of the Trace'
+set xlabel 'Duration of the Signal [s]'
 set ylabel 'Execution Time [s]'
-plot "$1" u (\$1/10):2 w lp title 'Overshoot',  "$1" u (\$1/10):4 w lp title 'Ringing'
+plot "$1" u 1:2 w lp title 'Overshoot',  "$1" u 1:4 w lp title 'Ringing'
 EOF

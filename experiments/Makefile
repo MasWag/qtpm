@@ -18,7 +18,7 @@ log/%/qtpm-BrCCPulseDensityRAM.tikz.tex: log/%/qtpm-all-BrCCPulseDensity.tsv ./p
 log/%/qtpm-all-BrCCPulse.tsv: log/%/qtpm-overshoot-BrCCPulse.tsv log/%/qtpm-ringing-BrCCPulse.tsv
 	paste $^ | cut -f 1-3,5,6 > $@
 log/%/qtpm-all-BrCCPulseDensity.tsv: log/%/qtpm-overshoot-BrCCPulseDensity.tsv log/%/qtpm-ringing-BrCCPulseDensity.tsv
-	paste $^ | cut -f 1-3,5,6 > $@
+	paste $^ | cut -f 1-3,5,6 | gtac > $@
 log/%/qtpm-overshoot-BrCCPulse.tsv: log/%/qtpm-overshoot-BrCCPulse-*.tsv-*.log make_tsv.sh
 	./make_tsv.sh $(dir $@)qtpm-overshoot-BrCCPulse.tsv qtpm-overshoot-BrCCPulse
 log/%/qtpm-overshoot-BrCCPulseDensity.tsv: log/%/qtpm-overshoot-BrCCPulseDensity-*.tsv-*.log make_tsv.sh

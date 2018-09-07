@@ -9,7 +9,7 @@ fi
 gnuplot <<EOF
 set terminal tikz
 set output "$2"
-set xlabel 'Length of the Trace'
+set xlabel 'Duration of the Signal [s]'
 set ylabel 'Memory Usage [kbyte]'
-plot "$1" u (\$1/10):3 w lp title 'Overshoot',  "$1" u (\$1/10):5 w lp title 'Ringing'
+plot "$1" u 1:3 w lp title 'Overshoot',  "$1" u 1:5 w lp title 'Ringing'
 EOF
