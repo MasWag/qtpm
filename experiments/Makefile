@@ -1,33 +1,36 @@
-all: rel2abs_truncate abs2rel convMonaa
+all: 
+	echo "There is no default target!!"
 
-LOG_DIRS = $(wildcard log/*/)
-ACCEL = $(LOG_DIRS:/=/filt-all-accel.tsv)
-GEAR = $(LOG_DIRS:/=/filt-all-gear.tsv)
-TORQUE = $(LOG_DIRS:/=/filt-all-torque.tsv)
+log/%/Logs: log/%/qtpm-overshoot-BrCCPulse.tsv log/%/qtpm-ringing-BrCCPulse.tsv log/%/qtpm-settling-BrCCPulse.tsv
 
-log/%/logs: log/%/filt-all-accel.tsv log/%/filt-all-gear.tsv log/%/filt-all-torque.tsv
+log/%/DensityLogs: log/%/qtpm-overshoot-BrCCPulseDensity.tsv log/%/qtpm-ringing-BrCCPulseDensity.tsv log/%/qtpm-settling-BrCCPulseDensity.tsv
 
-logs: $(ACCEL) $(GEAR) $(TORQUE)
 
-rel2abs_truncate: rel2abs_truncate.c
-	$(CC) -O3 $< -o $@
-abs2rel: abs2rel.c
-	$(CC) -O3 $< -o $@ 
-convMonaa: convMonaa.cc
-	$(CXX) --std=c++14 -O3 $< -o $@ 
-
-log/%/qtpm-BrCCPulse.tsv: log/%/qtpm-BrCCPulse-*.tsv-*.log make_tsv.sh
-	./make_tsv.sh ./log/%/qtpm-BrCCPulse.tsv
-log/%/qtpm-BrCCPulseDensity.tsv: log/%/qtpm-BrCCPulseDensity-*.tsv-*.log make_tsv.sh
-	./make_tsv.sh ./log/%/qtpm-BrCCPulseDensity.tsv
-log/%/qtpm-BrCCPulseTime.tikz.tex: log/%/qtpm-BrCCPulse.tsv
+log/%/qtpm-BrCCPulseTime.tikz.tex: log/%/qtpm-all-BrCCPulse.tsv ./plot_qtpm_time.sh
 	./plot_qtpm_time.sh $< $@
-log/%/qtpm-BrCCPulseRAM.tikz.tex: log/%/qtpm-BrCCPulse.tsv
+log/%/qtpm-BrCCPulseRAM.tikz.tex: log/%/qtpm-all-BrCCPulse.tsv ./plot_qtpm_ram.sh
 	./plot_qtpm_ram.sh $< $@
-log/%/qtpm-BrCCPulseDensityTime.tikz.tex: log/%/qtpm-BrCCPulseDensity.tsv
+log/%/qtpm-BrCCPulseDensityTime.tikz.tex: log/%/qtpm-all-BrCCPulseDensity.tsv ./plot_qtpm_density_time.sh
 	./plot_qtpm_density_time.sh $< $@
-log/%/qtpm-BrCCPulseDensityRAM.tikz.tex: log/%/qtpm-BrCCPulseDensity.tsv
-	./plot_qtpm_density_time.sh $< $@
+log/%/qtpm-BrCCPulseDensityRAM.tikz.tex: log/%/qtpm-all-BrCCPulseDensity.tsv ./plot_qtpm_density_ram.sh
+	./plot_qtpm_density_ram.sh $< $@
+
+log/%/qtpm-all-BrCCPulse.tsv: log/%/qtpm-overshoot-BrCCPulse.tsv log/%/qtpm-ringing-BrCCPulse.tsv
+	paste $^ | cut -f 1-3,5,6 > $@
+log/%/qtpm-all-BrCCPulseDensity.tsv: log/%/qtpm-overshoot-BrCCPulseDensity.tsv log/%/qtpm-ringing-BrCCPulseDensity.tsv
+	paste $^ | cut -f 1-3,5,6 > $@
+log/%/qtpm-overshoot-BrCCPulse.tsv: log/%/qtpm-overshoot-BrCCPulse-*.tsv-*.log make_tsv.sh
+	./make_tsv.sh $(dir $@)qtpm-overshoot-BrCCPulse.tsv qtpm-overshoot-BrCCPulse
+log/%/qtpm-overshoot-BrCCPulseDensity.tsv: log/%/qtpm-overshoot-BrCCPulseDensity-*.tsv-*.log make_tsv.sh
+	./make_tsv.sh $(dir $@)qtpm-overshoot-BrCCPulseDensity.tsv qtpm-overshoot-BrCCPulseDensity
+log/%/qtpm-ringing-BrCCPulse.tsv: log/%/qtpm-ringing-BrCCPulse-*.tsv-*.log make_tsv.sh
+	./make_tsv.sh $(dir $@)qtpm-ringing-BrCCPulse.tsv qtpm-ringing-BrCCPulse
+log/%/qtpm-ringing-BrCCPulseDensity.tsv: log/%/qtpm-ringing-BrCCPulseDensity-*.tsv-*.log make_tsv.sh
+	./make_tsv.sh $(dir $@)qtpm-ringing-BrCCPulseDensity.tsv qtpm-ringing-BrCCPulseDensity
+log/%/qtpm-settling-BrCCPulse.tsv: log/%/qtpm-settling-BrCCPulse-*.tsv-*.log make_tsv.sh
+	./make_tsv.sh $(dir $@)qtpm-settling-BrCCPulse.tsv qtpm-settling-BrCCPulse
+log/%/qtpm-settling-BrCCPulseDensity.tsv: log/%/qtpm-settling-BrCCPulseDensity-*.tsv-*.log make_tsv.sh
+	./make_tsv.sh $(dir $@)qtpm-settling-BrCCPulseDensity.tsv qtpm-settling-BrCCPulseDensity
 
 
 log/%/filt-time-length-accel.png: log/%/filt-all-accel.tsv ./plot_filt_time-length_0-10.sh
