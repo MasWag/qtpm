@@ -11,5 +11,5 @@ set terminal tikz
 set output "$2"
 set xlabel 'Duration of the Signal [s]'
 set ylabel 'Execution Time [s]'
-plot "$1" u 1:2 w lp title 'Overshoot',  "$1" u 1:4 w lp title 'Ringing'
+plot "$1" u 1:2 w lp title '$\textsc{Overshoot}',  "$1" u 1:4 w lp title '\textsc{Ringing}'
 EOF

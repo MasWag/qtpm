@@ -11,5 +11,5 @@ set terminal tikz
 set output "$2"
 set xlabel 'Duration of the Signal [s]'
 set ylabel 'Memory Usage [kbyte]'
-plot "$1" u 1:3 w lp title '\textsc{Overshoot}',  "$1" u 1:5 w lp title '\textsc{Ringing}'
+plot "$1" u 1:3 w lp title '\textsc{Overshoot (Unbounded)}'
 EOF
