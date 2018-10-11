@@ -7,9 +7,9 @@ if (($# < 2)); then
 fi
 
 gnuplot <<EOF
-set terminal tikz
+load 'common.plt'
 set output "$2"
 set xlabel 'Duration of the Signal [s]'
 set ylabel 'Execution Time [s]'
-plot "$1" u 1:2 w lp title '$\textsc{Overshoot}',  "$1" u 1:4 w lp title '\textsc{Ringing}'
+plot "$1" u 1:2 w lp title '\textsc{Overshoot}',  "$1" u 1:4 w lp title '\textsc{Ringing}'
 EOF

@@ -7,7 +7,7 @@ if (($# < 2)); then
 fi
 
 gnuplot <<EOF
-set terminal tikz
+load 'common.plt'
 set output "$2"
 set xlabel 'Sampling Frequency [Hz]'
 set ylabel 'Execution Time [s]'

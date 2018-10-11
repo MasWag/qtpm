@@ -16,7 +16,7 @@ elif [[ "$2" == density ]]; then
 elif [[ "$2" == unbounded ]]; then
     make -j $1/qtpm-BrCCPulseUnboundedTime.tikz.tex $1/qtpm-BrCCPulseUnboundedRAM.tikz.tex $1/qtpm-overshoot_unbounded-BrCCPulse.tsv &&
         cp $1/qtpm-BrCCPulseUnboundedTime.tikz.tex $1/qtpm-BrCCPulseUnboundedRAM.tikz.tex ~/Papers/qtpm/figs/ &&
-        cp $1/qtpm-overshoot_unbounded-BrCCPulse.tsv ~/Papers/qtpm/dat/qtpm-all-BrCCPulseBounded.tsv
+        cp $1/qtpm-overshoot_unbounded-BrCCPulse.tsv ~/Papers/qtpm/dat/qtpm-all-BrCCPulseUnbounded.tsv
 else
     echo 'type should be length, density, or unbounded'
     exit 1

@@ -6,17 +6,17 @@ log/%/Logs: log/%/qtpm-overshoot-BrCCPulse.tsv log/%/qtpm-ringing-BrCCPulse.tsv 
 log/%/DensityLogs: log/%/qtpm-overshoot-BrCCPulseDensity.tsv log/%/qtpm-ringing-BrCCPulseDensity.tsv log/%/qtpm-settling-BrCCPulseDensity.tsv
 
 
-log/%/qtpm-BrCCPulseTime.tikz.tex: log/%/qtpm-all-BrCCPulse.tsv ./plot_qtpm_time.sh
+log/%/qtpm-BrCCPulseTime.tikz.tex: log/%/qtpm-all-BrCCPulse.tsv ./plot_qtpm_time.sh common.plt
 	./plot_qtpm_time.sh $< $@
-log/%/qtpm-BrCCPulseRAM.tikz.tex: log/%/qtpm-all-BrCCPulse.tsv ./plot_qtpm_ram.sh
+log/%/qtpm-BrCCPulseRAM.tikz.tex: log/%/qtpm-all-BrCCPulse.tsv ./plot_qtpm_ram.sh common.plt
 	./plot_qtpm_ram.sh $< $@
-log/%/qtpm-BrCCPulseUnboundedTime.tikz.tex: log/%/qtpm-overshoot_unbounded-BrCCPulse.tsv ./plot_qtpm_unbounded_time.sh
+log/%/qtpm-BrCCPulseUnboundedTime.tikz.tex: log/%/qtpm-overshoot_unbounded-BrCCPulse.tsv ./plot_qtpm_unbounded_time.sh common.plt
 	./plot_qtpm_unbounded_time.sh $< $@
-log/%/qtpm-BrCCPulseUnboundedRAM.tikz.tex: log/%/qtpm-overshoot_unbounded-BrCCPulse.tsv ./plot_qtpm_unbounded_ram.sh
+log/%/qtpm-BrCCPulseUnboundedRAM.tikz.tex: log/%/qtpm-overshoot_unbounded-BrCCPulse.tsv ./plot_qtpm_unbounded_ram.sh common.plt
 	./plot_qtpm_unbounded_ram.sh $< $@
-log/%/qtpm-BrCCPulseDensityTime.tikz.tex: log/%/qtpm-all-BrCCPulseDensity.tsv ./plot_qtpm_density_time.sh
+log/%/qtpm-BrCCPulseDensityTime.tikz.tex: log/%/qtpm-all-BrCCPulseDensity.tsv ./plot_qtpm_density_time.sh common.plt
 	./plot_qtpm_density_time.sh $< $@
-log/%/qtpm-BrCCPulseDensityRAM.tikz.tex: log/%/qtpm-all-BrCCPulseDensity.tsv ./plot_qtpm_density_ram.sh
+log/%/qtpm-BrCCPulseDensityRAM.tikz.tex: log/%/qtpm-all-BrCCPulseDensity.tsv ./plot_qtpm_density_ram.sh common.plt
 	./plot_qtpm_density_ram.sh $< $@
 
 log/%/qtpm-all-BrCCPulse.tsv: log/%/qtpm-overshoot-BrCCPulse.tsv log/%/qtpm-ringing-BrCCPulse.tsv

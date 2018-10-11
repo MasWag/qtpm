@@ -1,0 +1,1 @@
+set terminal tikz font ",14"
