@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 echo 'set sample 300'
 echo 'set isosample 300,300'
 echo 'set pm3d map'
