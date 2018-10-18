@@ -10,6 +10,6 @@ gnuplot <<EOF
 load 'common.plt'
 set output "$2"
 set xlabel 'Duration of the Signal [s]'
-set ylabel 'Memory Usage [kbyte]'
+set ylabel 'Memory Usage [KB]'
 plot "$1" u 1:3 w lp title '\textsc{Overshoot (Unbounded)}'
 EOF

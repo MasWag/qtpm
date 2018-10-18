@@ -12,7 +12,7 @@ echo 'set grid on'
 
 echo "set palette defined ( -30 '#66FFFF', 10 '#000099')"
 sed '/===/ d;s/----*//g;s/Weight://;s/$/ \&\&/' |
-    gsed 'N;N;N;s/\n/ /g' |
+    gsed 'N;N;N;s/\n/ /g'  | sort -rn |
     sed "s/t' - t/y - x \&\& y - x/;s/t'/y \&\& y/;s/ t / x \&\& x /;" |
     awk 'BEGIN{ORS=" ";print "f(x,y)="}{NF-=1;fml=$0;sub(/^[^&]*\&\& /,"",fml);print "(",fml,")?"$1":"}END{print "1/0\n"}'
-echo 'splot [0:6.5] [0:6.5] f(x,y) notitle'
+echo "splot [$1] [$1] f(x,y) notitle"
