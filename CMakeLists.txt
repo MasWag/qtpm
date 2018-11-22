@@ -1,6 +1,12 @@
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-deprecated-register")
 
-project(QuantitativeTimedPatternMatching CXX)
+project("Quantitative Timed Pattern Matching" CXX)
+
+# The project version number.
+set(VERSION_MAJOR   0   CACHE STRING "Project major version number.")
+set(VERSION_MINOR   1   CACHE STRING "Project minor version number.")
+set(VERSION_PATCH   0   CACHE STRING "Project patch version number.")
+mark_as_advanced(VERSION_MAJOR VERSION_MINOR VERSION_PATCH)
 
 cmake_minimum_required(VERSION 3.1)
 set(CMAKE_CXX_FLAGS "-Wall -std=c++14 -march=native")

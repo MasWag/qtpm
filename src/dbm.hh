@@ -41,7 +41,7 @@ operator- (Bounds a, const double b) {
 
 
 #include <eigen3/Eigen/Core>
-//! @TODO configure include directory for eigen
+//! @todo configure include directory for eigen
 
 struct DBM {
   using Tuple = std::tuple<std::vector<Bounds>,Bounds>;
@@ -77,7 +77,7 @@ struct DBM {
     return std::tuple<std::vector<Bounds>,Bounds>(std::vector<Bounds>(value.data() + 1, value.data() + value.size()),M);
   }
 
-  //! @brief add the constraint x - y \le (c,s) but does not close.
+  //! @brief add the constraint x - y <= (c,s) but does not close.
   //! @note The result is not canonized
   void tightenWithoutClose(uint8_t x, uint8_t y, Bounds c) {
     x++;
