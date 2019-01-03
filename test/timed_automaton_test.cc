@@ -231,32 +231,42 @@ BOOST_AUTO_TEST_CASE(parsePhi7Test)
 {
   using SignalVariables = uint8_t;
   using ClockVariables = uint8_t;
-  TSAM<SignalVariables, ClockVariables> TA;
+  TSAM<SignalVariables, ClockVariables, uint8_t> TA;
   std::ifstream file("../test/dot/memories/phi7.dot");
-  std::vector<typename BoostTimedAutomaton<SignalVariables, ClockVariables>::vertex_descriptor> initStates;
-  parseTSAM(file, TA, initStates);
+  std::vector<typename TSAM<SignalVariables, ClockVariables, uint8_t>::vertex_descriptor> initStates;
+  parseTSAM<SignalVariables, ClockVariables, uint8_t>(file, TA, initStates);
 
-  const auto max_constraints = boost::get_property(TA, boost::graph_max_constraints);
+  // const auto max_constraints = boost::get_property(TA, boost::graph_max_constraints);
   const auto num_of_vars = boost::get_property(TA, boost::graph_num_of_vars);
-  BOOST_CHECK_EQUAL(max_constraints, 4);
   BOOST_CHECK_EQUAL(num_of_vars, 1);
 
-#error("KOKOKARA!!!")
 
-  BOOST_TEST(!TA[0].isMatch);
-  BOOST_TEST(!TA[1].isMatch);
-  BOOST_TEST( TA[2].isMatch);
-  BOOST_TEST( TA[0].isInit);
-  BOOST_TEST(!TA[1].isInit);
-  BOOST_TEST(!TA[2].isInit);
-  BOOST_CHECK_EQUAL(TA[0].label.size(), 2);
-  BOOST_CHECK_EQUAL(TA[1].label.size(), 1);
-  BOOST_CHECK_EQUAL(TA[2].label.size(), 0);
-  auto transition = boost::edge(boost::vertex(0, TA), boost::vertex(1, TA), TA).first;
+  // BOOST_TEST(!TA[0].isMatch);
+  // BOOST_TEST(!TA[1].isMatch);
+  // BOOST_TEST( TA[2].isMatch);
+  // BOOST_TEST( TA[0].isInit);
+  // BOOST_TEST(!TA[1].isInit);
+  // BOOST_TEST(!TA[2].isInit);
+  // BOOST_CHECK_EQUAL(TA[0].label.size(), 2);
+  // BOOST_CHECK_EQUAL(TA[0].label[1].kind, ComplicatedConstraint::kind_t::GT);
+  // BOOST_CHECK_EQUAL(TA[0].label[1].first.kind, Expression::kind_t::TIMES);
+  // BOOST_CHECK_EQUAL(TA[0].label[1].second.kind, Expression::kind_t::PLUS);
+  // BOOST_CHECK_EQUAL(TA[1].label.size(), 1);
+  // BOOST_CHECK_EQUAL(TA[1].label.front().kind, ComplicatedConstraint::kind_t::LT);
+  // BOOST_CHECK_EQUAL(TA[1].label.front().first.kind, Expression::kind_t::MINUS);
+  // BOOST_CHECK_EQUAL(TA[1].label.front().first.first.kind, Expression::kind_t::DVAR);
+  // BOOST_CHECK_EQUAL(TA[1].label.front().first.first.variable, 0);
+  // BOOST_CHECK_EQUAL(TA[1].label.front().first.second.kind, Expression::kind_t::MVAR);
+  // BOOST_CHECK_EQUAL(TA[1].label.front().first.second.variable, 0);
+  // BOOST_CHECK_EQUAL(TA[2].label.size(), 0);
+  // auto transition = boost::edge(boost::vertex(0, TA), boost::vertex(1, TA), TA).first;
 
-  BOOST_CHECK_EQUAL(boost::get(&BoostTATransition<ClockVariables>::resetVars, TA, transition).resetVars.size(), 1);
-  BOOST_CHECK_EQUAL(boost::get(&BoostTATransition<ClockVariables>::resetVars, TA, transition).resetVars[0], 0);
+  // BOOST_CHECK_EQUAL(boost::get(&BoostTATransition<ClockVariables>::resetVars, TA, transition).resetVars.size(), 1);
+  // BOOST_CHECK_EQUAL(boost::get(&BoostTATransition<ClockVariables>::resetVars, TA, transition).resetVars[0], 0);
+  // BOOST_CHECK_EQUAL(boost::get(&BoostTATransition<ClockVariables>::resetVars, TA, transition).assign.size(), 1);
+  // BOOST_CHECK_EQUAL(boost::get(&BoostTATransition<ClockVariables>::resetVars, TA, transition).assign.first, 0);
+  // BOOST_CHECK_EQUAL(boost::get(&BoostTATransition<ClockVariables>::resetVars, TA, transition).assign.second, 0);
 
-  BOOST_CHECK_EQUAL(boost::get(&BoostTATransition<ClockVariables>::guard, TA, transition).size(), 0);
+  // BOOST_CHECK_EQUAL(boost::get(&BoostTATransition<ClockVariables>::guard, TA, transition).size(), 0);
 }
 BOOST_AUTO_TEST_SUITE_END()

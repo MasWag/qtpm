@@ -156,7 +156,6 @@ template <class T>
 static inline 
 std::istream& operator>>(std::istream& is, std::vector<T>& resetVars)
 {
-
   resetVars.clear();
   if (!is) {
     is.setstate(std::ios_base::failbit);
@@ -268,13 +267,24 @@ std::ostream& operator<<(std::ostream& os, const Assigns<MemoryVariables>& assig
   return os;
 }
 
+struct ComplicatedConstraintSystem {
+  std::vector<ComplicatedConstraint> v;
+};
+
 static inline 
-std::istream& operator>>(std::istream& is, ComplicatedConstraint& guard)
+std::istream& operator>>(std::istream& is, ComplicatedConstraintSystem& guard)
 {
   driverRef->parse(is);
-  guard = driverRef->getResult();
+  guard.v = driverRef->getResult();
 
   return is;
+}
+
+static inline 
+std::ostream& operator<<(std::ostream& os, const ComplicatedConstraintSystem& guard)
+{
+  os << guard;
+  return os;
 }
 
 using Assign = std::pair<std::size_t, std::size_t>;
@@ -282,37 +292,44 @@ using Assign = std::pair<std::size_t, std::size_t>;
 static inline std::istream& operator>>(std::istream& is, Assign& p)
 {
   if (is.get() != 'm') {
+    abort();
     is.setstate(std::ios_base::failbit);
     return is;
   }
   is >> p.first;
 
   if (!is) {
+    abort();
     is.setstate(std::ios_base::failbit);
     return is;
   }
 
   if (is.get() != ' ') {
+    abort();
     is.setstate(std::ios_base::failbit);
     return is;
   }
 
   if (is.get() != ':') {
+    abort();
     is.setstate(std::ios_base::failbit);
     return is;
   }
 
   if (is.get() != '=') {
+    abort();
     is.setstate(std::ios_base::failbit);
     return is;
   }
 
   if (is.get() != ' ') {
+    abort();
     is.setstate(std::ios_base::failbit);
     return is;
   }
   
   if (is.get() != 'x') {
+    abort();
     is.setstate(std::ios_base::failbit);
     return is;
   }
@@ -335,12 +352,18 @@ struct BoostTATransition {
   std::vector<Constraint<ClockVariables>> guard;
 };
 
+struct TAStateMemory {
+  bool isInit;
+  bool isMatch;
+  ComplicatedConstraintSystem label;
+};
+
 template<class ClockVariables, class MemoryVariables>
 struct TATransitionMemory {
   //! @note this structure is necessary because of some problem in boost graph
   ResetVars<ClockVariables> resetVars;
   Assigns<MemoryVariables> assigns;
-  std::vector<ComplicatedConstraint> guard;
+  std::vector<Constraint<ClockVariables>> guard;
 };
 
 template<class SignalVariables, class ClockVariables>
@@ -352,9 +375,8 @@ using BoostTimedAutomaton = boost::adjacency_list<boost::listS, boost::vecS, boo
   @brief Timed Symbolic Automaton with memories 
 */
 template<class SignalVariables, class ClockVariables, class MemoryVariables>
-using TSAM = boost::adjacency_list<boost::listS, boost::vecS, boost::directedS, BoostTAState<SignalVariables>, TATransitionMemory<ClockVariables, MemoryVariables>, 
-                                   boost::property<boost::graph_num_of_vars_t, std::size_t,
-                                                   boost::property<boost::graph_max_constraints_t, std::size_t>>>;
+using TSAM = boost::adjacency_list<boost::listS, boost::vecS, boost::directedS, TAStateMemory, TATransitionMemory<ClockVariables, MemoryVariables>, 
+                                   boost::property<boost::graph_num_of_vars_t, std::size_t>>;
 
 template<class SignalVariables, class ClockVariables>
 static inline 
@@ -368,6 +390,9 @@ void parseBoostTA(std::istream &file, BoostTimedAutomaton<SignalVariables, Clock
   dp.property("label", boost::get(&BoostTAState<SignalVariables>::label, BoostTA));
   dp.property("reset", boost::get(&BoostTATransition<ClockVariables>::resetVars, BoostTA));
   dp.property("guard", boost::get(&BoostTATransition<ClockVariables>::guard, BoostTA));
+
+  std::unique_ptr<ConstraintDriver> driver = std::make_unique<ConstraintDriver>();
+  driverRef = std::move(driver);
 
   boost::read_graphviz(file, BoostTA, dp, "id");
 
@@ -400,16 +425,16 @@ void parseTSAM(std::istream &file, TSAM<SignalVariables, ClockVariables, MemoryV
 {
 
   boost::dynamic_properties dp(boost::ignore_other_properties);
-  dp.property("match", boost::get(&BoostTAState<SignalVariables>::isMatch, BoostTA));
-  dp.property("init",  boost::get(&BoostTAState<SignalVariables>::isInit, BoostTA));
-  dp.property("label", boost::get(&BoostTAState<SignalVariables>::label, BoostTA));
-  dp.property("reset", boost::get(&BoostTATransition<ClockVariables>::resetVars, BoostTA));
-  dp.property("assign", boost::get(&BoostTATransition<ClockVariables>::assign, BoostTA));
-  dp.property("guard", boost::get(&BoostTATransition<ClockVariables>::guard, BoostTA));
+  dp.property("match", boost::get(&TAStateMemory::isMatch, BoostTA));
+  dp.property("init",  boost::get(&TAStateMemory::isInit, BoostTA));
+  dp.property("label", boost::get(&TAStateMemory::label, BoostTA));
+  dp.property("reset", boost::get(&TATransitionMemory<ClockVariables, MemoryVariables>::resetVars, BoostTA));
+  dp.property("assign", boost::get(&TATransitionMemory<ClockVariables, MemoryVariables>::assigns, BoostTA));
+  dp.property("guard", boost::get(&TATransitionMemory<ClockVariables, MemoryVariables>::guard, BoostTA));
 
-  boost::read_graphviz(file, BoostTA, dp, "id");
+  boost::read_graphviz(file, BoostTA, dp);
 
-  auto isMatchMap = boost::get(&BoostTAState<SignalVariables>::isInit, BoostTA);
+  auto isMatchMap = boost::get(&TAStateMemory::isInit, BoostTA);
   for (auto range = boost::vertices(BoostTA); range.first != range.second; range.first++) {
     auto q = *range.first;
     if (isMatchMap[q]) {
@@ -418,15 +443,12 @@ void parseTSAM(std::istream &file, TSAM<SignalVariables, ClockVariables, MemoryV
   }
 
   std::size_t num_of_vars = 0;
-  std::size_t max_constraints = 0;
   for (auto range = boost::edges(BoostTA); range.first != range.second; range.first++) {
     auto guard = BoostTA[*range.first].guard;
     for (auto g: guard) {
       num_of_vars = std::max<std::size_t>(num_of_vars, g.x + 1);
-      max_constraints = std::max<std::size_t>(max_constraints, g.c);
     }
   }
 
-  boost::set_property(BoostTA, boost::graph_max_constraints, max_constraints);
   boost::set_property(BoostTA, boost::graph_num_of_vars, num_of_vars);
 }

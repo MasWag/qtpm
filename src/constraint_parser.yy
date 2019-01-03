@@ -68,12 +68,12 @@ constraint : expr LT expr { $$ = $1 < $3; }
            | expr GE expr { $$ = $1 >= $3; }
            | expr EQ expr { $$ = $1 == $3; }
 
-expr : INT { $$ = std::make_shared<Expression>(Expression::kind_t::INT, $1); }
-     | DVar { $$ = std::make_shared<Expression>(Expression::kind_t::DVAR, $1); }
-     | MVar { $$ = std::make_shared<Expression>(Expression::kind_t::MVAR, $1); }
+expr : expr STAR  expr { $$ = $1 * $3; }
      | expr PLUS  expr { $$ = $1 + $3; }
      | expr MINUS expr { $$ = $1 - $3; }
-     | expr STAR  expr { $$ = $1 * $3; }
+     | INT { $$ = std::make_shared<Expression>(Expression::kind_t::INT, $1); }
+     | DVar { $$ = std::make_shared<Expression>(Expression::kind_t::DVAR, $1); }
+     | MVar { $$ = std::make_shared<Expression>(Expression::kind_t::MVAR, $1); }
 
 %%
 

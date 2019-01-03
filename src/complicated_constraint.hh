@@ -1,4 +1,5 @@
 #pragma once
+#include <ostream>
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -60,6 +61,21 @@ struct Expression {
       break;
     }
   }
+  std::size_t max_var() { 
+    switch (kind) {
+    case kind_t::INT:
+      return 0;
+    case kind_t::DVAR: 
+    case kind_t::MVAR: 
+      return variable;
+    case kind_t::PLUS: 
+    case kind_t::MINUS: 
+    case kind_t::TIMES:
+      return std::max(children.first->max_var(), children.second->max_var());
+    }
+    abort();
+    return 0;
+  };
 };
 
 static inline std::shared_ptr<Expression> operator+(std::shared_ptr<Expression> first,
@@ -81,6 +97,9 @@ struct ComplicatedConstraint {
   std::shared_ptr<Expression> first;
   enum class kind_t {LT, LE, EQ, GE, GT} kind;
   std::shared_ptr<Expression> second;
+  std::size_t max_var() { 
+    return std::max(first->max_var(), second->max_var());
+  };
 };
 
 static inline ComplicatedConstraint operator<(std::shared_ptr<Expression> first,
@@ -102,4 +121,27 @@ static inline ComplicatedConstraint operator>=(std::shared_ptr<Expression> first
 static inline ComplicatedConstraint operator>(std::shared_ptr<Expression> first,
                                        std::shared_ptr<Expression> second) {
   return {first, ComplicatedConstraint::kind_t::GT, second};
+}
+
+static inline std::ostream& operator<<(std::ostream& os, const ComplicatedConstraint &cs) {
+  os << cs.first;
+  switch (cs.kind) {
+  case ComplicatedConstraint::kind_t::LT:
+    os << " < ";
+    break;
+  case ComplicatedConstraint::kind_t::LE:
+    os << " <= ";
+    break;
+  case ComplicatedConstraint::kind_t::EQ:
+    os << " == ";
+    break;
+  case ComplicatedConstraint::kind_t::GE:
+    os << " >= ";
+    break;
+  case ComplicatedConstraint::kind_t::GT:
+    os << " > ";
+    break;
+  }
+  os << cs.second;  
+  return os;
 }

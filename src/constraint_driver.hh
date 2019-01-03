@@ -20,7 +20,7 @@
 */
 class ConstraintDriver{
 public:
-  ConstraintDriver(const std::size_t paramDimensions) : paramDimensions(paramDimensions) {};
+  ConstraintDriver() {};
    
   /** 
    * parse - parse from a file
@@ -53,9 +53,6 @@ public:
 
   std::ostream& print(std::ostream);
 private:
-  //! @params paramDimensions parameter dimension of the PTA 
-  const std::size_t paramDimensions;
-
   std::vector<ComplicatedConstraint> result;
   bool parse_helper( std::istream &stream) {
     result.clear();
