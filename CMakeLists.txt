@@ -7,6 +7,8 @@ set(CMAKE_CXX_FLAGS "-Wall -std=c++14 -march=native")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -DDEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE "-flto -O3 -DRELEASE")
 
+find_package(BISON REQUIRED)
+find_package(FLEX REQUIRED)
 find_package(Boost 1.59.0 REQUIRED COMPONENTS
   program_options unit_test_framework iostreams graph)
 find_package(Eigen3 REQUIRED)
@@ -16,7 +18,15 @@ include_directories(
   ${PROJECT_BINARY_DIR}
   ${Boost_INCLUDE_DIRS})
 
-## Config for Main monaa
+BISON_TARGET(constraint_parser
+  src/constraint_parser.yy
+  ${CMAKE_CURRENT_BINARY_DIR}/constraint_parser.tab.cc)
+FLEX_TARGET(constraint_lexer
+  src/constraint_lexer.l
+  ${CMAKE_CURRENT_BINARY_DIR}/constraint_lexer.yy.cc)
+ADD_FLEX_BISON_DEPENDENCY(constraint_lexer constraint_parser)
+
+## Config for Main qtpm
 add_executable(qtpm
   src/main.cc)
 target_link_libraries(qtpm
@@ -37,6 +47,8 @@ add_executable(unit_test
   test/warshall_froid_test.cc
   test/robustness_test.cc
   test/quantitative_timed_pattern_matching_test.cc
+  ${FLEX_constraint_lexer_OUTPUTS}
+  ${BISON_constraint_parser_OUTPUTS}
   test/bellman_ford_test.cc)
 
 target_link_libraries(unit_test
