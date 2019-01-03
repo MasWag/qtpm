@@ -25,6 +25,71 @@ struct num_type_trait<unsigned char> {
   using num_type = unsigned int;
 };
 
+struct Assign {
+  std::size_t first, second;
+};
+
+static inline std::istream& operator>>(std::istream& is, Assign& p)
+{
+  if (is.get() != 'm') {
+    abort();
+    is.setstate(std::ios_base::failbit);
+    return is;
+  }
+  is >> p.first;
+
+  if (!is) {
+    abort();
+    is.setstate(std::ios_base::failbit);
+    return is;
+  }
+
+  if (is.get() != ' ') {
+    abort();
+    is.setstate(std::ios_base::failbit);
+    return is;
+  }
+
+  if (is.get() != ':') {
+    abort();
+    is.setstate(std::ios_base::failbit);
+    return is;
+  }
+
+  if (is.get() != '=') {
+    abort();
+    is.setstate(std::ios_base::failbit);
+    return is;
+  }
+
+  if (is.get() != ' ') {
+    abort();
+    is.setstate(std::ios_base::failbit);
+    return is;
+  }
+  
+  if (is.get() != 'x') {
+    abort();
+    is.setstate(std::ios_base::failbit);
+    return is;
+  }
+  is >> p.second;
+
+  return is;
+}
+
+static inline std::ostream& operator<<(std::ostream& os, const Assign& p)
+{
+  os << 'm';
+  os << p.first;
+
+  os << " := x";
+
+  os << p.second;
+
+  return os;
+}
+
 namespace boost{
   enum vertex_match_t {vertex_match};
   enum edge_reset_t {edge_reset};
@@ -230,11 +295,6 @@ struct ResetVars {
   std::vector<ClockVariables> resetVars;
 };
 
-template<class MemoryVariables>
-struct Assigns {
-  std::vector<MemoryVariables> assignVars;
-};
-
 template<class ClockVariables>
 static inline 
 std::istream& operator>>(std::istream& is, ResetVars<ClockVariables>& resetVars)
@@ -248,22 +308,6 @@ static inline
 std::ostream& operator<<(std::ostream& os, const ResetVars<ClockVariables>& resetVars)
 {
   os << resetVars.resetVars;
-  return os;
-}
-
-template<class MemoryVariables>
-static inline 
-std::istream& operator>>(std::istream& is, Assigns<MemoryVariables>& assigns)
-{
-  is >> assigns.assignVars;
-  return is;
-}
-
-template<class MemoryVariables>
-static inline 
-std::ostream& operator<<(std::ostream& os, const Assigns<MemoryVariables>& assigns)
-{
-  os << assigns.assignVars;
   return os;
 }
 
@@ -287,55 +331,22 @@ std::ostream& operator<<(std::ostream& os, const ComplicatedConstraintSystem& gu
   return os;
 }
 
-using Assign = std::pair<std::size_t, std::size_t>;
+struct Assigns {
+  std::vector<Assign> assignVars;
+};
 
-static inline std::istream& operator>>(std::istream& is, Assign& p)
+static inline 
+std::istream& operator>>(std::istream& is, Assigns& assigns)
 {
-  if (is.get() != 'm') {
-    abort();
-    is.setstate(std::ios_base::failbit);
-    return is;
-  }
-  is >> p.first;
-
-  if (!is) {
-    abort();
-    is.setstate(std::ios_base::failbit);
-    return is;
-  }
-
-  if (is.get() != ' ') {
-    abort();
-    is.setstate(std::ios_base::failbit);
-    return is;
-  }
-
-  if (is.get() != ':') {
-    abort();
-    is.setstate(std::ios_base::failbit);
-    return is;
-  }
-
-  if (is.get() != '=') {
-    abort();
-    is.setstate(std::ios_base::failbit);
-    return is;
-  }
-
-  if (is.get() != ' ') {
-    abort();
-    is.setstate(std::ios_base::failbit);
-    return is;
-  }
-  
-  if (is.get() != 'x') {
-    abort();
-    is.setstate(std::ios_base::failbit);
-    return is;
-  }
-  is >> p.second;
-
+  is >> assigns.assignVars;
   return is;
+}
+
+static inline 
+std::ostream& operator<<(std::ostream& os, const Assigns& assigns)
+{
+  os << assigns.assignVars;
+  return os;
 }
 
 template<class SignalVariables>
@@ -362,7 +373,7 @@ template<class ClockVariables, class MemoryVariables>
 struct TATransitionMemory {
   //! @note this structure is necessary because of some problem in boost graph
   ResetVars<ClockVariables> resetVars;
-  Assigns<MemoryVariables> assigns;
+  Assigns assigns;
   std::vector<Constraint<ClockVariables>> guard;
 };
 

@@ -18,7 +18,7 @@ struct Expression {
     std::pair<std::shared_ptr<Expression>, std::shared_ptr<Expression>> children;
   };
   Expression(kind_t kind, std::size_t variable) :kind(kind), variable(variable) {
-    assert(kind == kind_t::DVAR || kind == kind_t::MVAR);
+    assert(kind == kind_t::INT || kind == kind_t::DVAR || kind == kind_t::MVAR);
   }
 
   Expression(kind_t kind,

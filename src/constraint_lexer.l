@@ -44,12 +44,12 @@ using token = Freezing::ConstraintParser::token;
 "}"          return token::END;
 
 x[0-9]+ {
-    yylval->build<int>( atoi(yytext + 1) );
+    yylval->build<std::size_t>( atoi(yytext + 1) );
     return token::DVar;
 }
 
 m[0-9]+ {
-    yylval->build<int>( atoi(yytext + 1) );
+    yylval->build<std::size_t>( atoi(yytext + 1) );
     return token::MVar;
 }
 
