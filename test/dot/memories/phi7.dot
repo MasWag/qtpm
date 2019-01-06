@@ -9,8 +9,8 @@ Montre TRE: (A|B|C|D)%(0,400);C;(C|D)
 MONAA TRE: ((A|B|C|D)*C)%(0,4)((C|D)*)
 */
 digraph G {
-        0 [label="{x0 < 100, x0 * x1 > x0 + x1}"][init=1][match=0];
-        1 [label="{x0 - m0 < 100}"][init=0][match=0];
+        0 [label="x0 < 100 && x0 * x1 > x0 + x1"][init=1][match=0];
+        1 [label="x0 - m0 < 100"][init=0][match=0];
         2 [init=0][match=1];
         0->1 [reset="{0}"][assign="{m0 := x0}"];
 

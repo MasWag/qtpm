@@ -47,19 +47,25 @@
   EQ          "=="
   COMMA       ","
   BEGIN_TOKEN "{"
+  AND         "&&"
+  OR          "||"
+  NOT         "!"
 ;
 
 %locations
 
-%type <ComplicatedConstraint>          constraint
-%type <std::shared_ptr<Expression>>   expr
+%type <std::shared_ptr<BooleanConstraint>>     boolean
+%type <std::shared_ptr<ComplicatedConstraint>> constraint
+%type <std::shared_ptr<Expression>>            expr
 
 %%
 
-unit : BEGIN_TOKEN constraint_system END
+unit : boolean END { driver.result = $1; }
 
-constraint_system : constraint { driver.result = {$1}; }
-                  | constraint_system COMMA constraint { driver.result.push_back(std::move($3)); }
+boolean : constraint { $$ = std::make_shared<BooleanConstraint>(BooleanConstraint::kind_t::ATOM, $1); }
+        | boolean OR boolean { $$ = $1 || $3; }
+        | boolean AND boolean { $$ = $1 && $3; }
+        | NOT boolean { $$ = !$2; }
 
 /* The order matters */
 constraint : expr LT expr { $$ = $1 < $3; }

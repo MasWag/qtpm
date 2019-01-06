@@ -47,15 +47,14 @@ public:
     return parse_helper(stream);
   }
 
-  const std::vector<ComplicatedConstraint>& getResult() const {
+  const std::shared_ptr<BooleanConstraint> getResult() const {
     return result;
   }
 
   std::ostream& print(std::ostream);
 private:
-  std::vector<ComplicatedConstraint> result;
+  std::shared_ptr<BooleanConstraint> result;
   bool parse_helper( std::istream &stream) {
-    result.clear();
     ConstraintScanner scanner(&stream);
     Freezing::ConstraintParser parser( scanner /* scanner */, 
                              (*this) /* driver */

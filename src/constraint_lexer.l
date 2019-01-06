@@ -42,6 +42,9 @@ using token = Freezing::ConstraintParser::token;
 ","          return token::COMMA;
 "{"          return token::BEGIN_TOKEN;
 "}"          return token::END;
+"&&"         return token::AND;
+"||"         return token::OR;
+"!"          return token::NOT;
 
 x[0-9]+ {
     yylval->build<std::size_t>( atoi(yytext + 1) );

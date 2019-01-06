@@ -311,24 +311,13 @@ std::ostream& operator<<(std::ostream& os, const ResetVars<ClockVariables>& rese
   return os;
 }
 
-struct ComplicatedConstraintSystem {
-  std::vector<ComplicatedConstraint> v;
-};
-
 static inline 
-std::istream& operator>>(std::istream& is, ComplicatedConstraintSystem& guard)
+std::istream& operator>>(std::istream& is, std::shared_ptr<BooleanConstraint>& guard)
 {
   driverRef->parse(is);
-  guard.v = driverRef->getResult();
+  guard = driverRef->getResult();
 
   return is;
-}
-
-static inline 
-std::ostream& operator<<(std::ostream& os, const ComplicatedConstraintSystem& guard)
-{
-  os << guard;
-  return os;
 }
 
 struct Assigns {
@@ -366,7 +355,7 @@ struct BoostTATransition {
 struct TAStateMemory {
   bool isInit;
   bool isMatch;
-  ComplicatedConstraintSystem label;
+  std::shared_ptr<BooleanConstraint> label;
 };
 
 template<class ClockVariables, class MemoryVariables>
