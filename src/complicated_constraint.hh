@@ -78,16 +78,19 @@ struct Expression {
   };
 };
 
+__attribute__((unused))
 static inline std::shared_ptr<Expression> operator+(std::shared_ptr<Expression> first,
                                                     std::shared_ptr<Expression> second) {
   return std::make_shared<Expression>(Expression::kind_t::PLUS, first, second);
 }
 
+__attribute__((unused))
 static inline std::shared_ptr<Expression> operator-(std::shared_ptr<Expression> first,
                                                     std::shared_ptr<Expression> second) {
   return std::make_shared<Expression>(Expression::kind_t::MINUS, first, second);
 }
 
+__attribute__((unused))
 static inline std::shared_ptr<Expression> operator*(std::shared_ptr<Expression> first,
                                                     std::shared_ptr<Expression> second) {
   return std::make_shared<Expression>(Expression::kind_t::TIMES, first, second);
@@ -105,28 +108,34 @@ struct ComplicatedConstraint {
   };
 };
 
+__attribute__((unused))
 static inline std::shared_ptr<ComplicatedConstraint>
 operator<(std::shared_ptr<Expression> first,
           std::shared_ptr<Expression> second) {
   return std::make_shared<ComplicatedConstraint>(first, ComplicatedConstraint::kind_t::LT, second);
 }
+__attribute__((unused))
 static inline std::shared_ptr<ComplicatedConstraint> operator<=(std::shared_ptr<Expression> first,
                                                                 std::shared_ptr<Expression> second) {
   return std::make_shared<ComplicatedConstraint>(first, ComplicatedConstraint::kind_t::LE, second);
 }
+__attribute__((unused))
 static inline std::shared_ptr<ComplicatedConstraint> operator==(std::shared_ptr<Expression> first,
                                                                 std::shared_ptr<Expression> second) {
   return std::make_shared<ComplicatedConstraint>(first, ComplicatedConstraint::kind_t::EQ, second);
 }
+__attribute__((unused))
 static inline std::shared_ptr<ComplicatedConstraint> operator>=(std::shared_ptr<Expression> first,
                                                                 std::shared_ptr<Expression> second) {
   return std::make_shared<ComplicatedConstraint>(first, ComplicatedConstraint::kind_t::GE, second);
 }
+__attribute__((unused))
 static inline std::shared_ptr<ComplicatedConstraint> operator>(std::shared_ptr<Expression> first,
                                                                std::shared_ptr<Expression> second) {
   return std::make_shared<ComplicatedConstraint>(first, ComplicatedConstraint::kind_t::GT, second);
 }
 
+__attribute__((unused))
 static inline std::ostream& operator<<(std::ostream& os, const ComplicatedConstraint &cs) {
   os << cs.first;
   switch (cs.kind) {
@@ -191,26 +200,22 @@ struct BooleanConstraint {
   }
 };
 
+__attribute__((unused))
 static inline std::shared_ptr<BooleanConstraint> operator&&(std::shared_ptr<BooleanConstraint> first,
                                                             std::shared_ptr<BooleanConstraint> second) {
   return std::make_shared<BooleanConstraint>(first, BooleanConstraint::kind_t::AND, second);
 }
+__attribute__((unused))
 static inline std::shared_ptr<BooleanConstraint> operator||(std::shared_ptr<BooleanConstraint> first,
                                                             std::shared_ptr<BooleanConstraint> second) {
   return std::make_shared<BooleanConstraint>(first, BooleanConstraint::kind_t::OR, second);
 }
+__attribute__((unused))
 static inline std::shared_ptr<BooleanConstraint> operator!(std::shared_ptr<BooleanConstraint> child) {
   return std::make_shared<BooleanConstraint>(BooleanConstraint::kind_t::NOT, child);
 }
 
-static inline 
-std::ostream& operator<<(std::ostream& os, const std::shared_ptr<BooleanConstraint> guard)
-{
-  os << guard;
-
-  return os;
-}
-
+__attribute__((unused))
 static inline 
 std::ostream& operator<<(std::ostream& os, const BooleanConstraint::kind_t kind)
 {
@@ -231,6 +236,7 @@ std::ostream& operator<<(std::ostream& os, const BooleanConstraint::kind_t kind)
   return os;
 }
 
+__attribute__((unused))
 static inline 
 std::ostream& operator<<(std::ostream& os, const ComplicatedConstraint::kind_t kind)
 {
@@ -255,6 +261,7 @@ std::ostream& operator<<(std::ostream& os, const ComplicatedConstraint::kind_t k
   return os;
 }
 
+__attribute__((unused))
 static inline 
 std::ostream& operator<<(std::ostream& os, const Expression::kind_t kind)
 {
