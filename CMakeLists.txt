@@ -28,6 +28,8 @@ ADD_FLEX_BISON_DEPENDENCY(constraint_lexer constraint_parser)
 
 ## Config for Main qtpm
 add_executable(qtpm
+  ${FLEX_constraint_lexer_OUTPUTS}
+  ${BISON_constraint_parser_OUTPUTS}
   src/main.cc)
 target_link_libraries(qtpm
 #  profiler
