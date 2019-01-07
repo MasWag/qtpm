@@ -396,9 +396,6 @@ void parseBoostTA(std::istream &file, BoostTimedAutomaton<SignalVariables, Clock
   dp.property("reset", boost::get(&BoostTATransition<ClockVariables>::resetVars, BoostTA));
   dp.property("guard", boost::get(&BoostTATransition<ClockVariables>::guard, BoostTA));
 
-  std::unique_ptr<ConstraintDriver> driver = std::make_unique<ConstraintDriver>();
-  driverRef = std::move(driver);
-
   boost::read_graphviz(file, BoostTA, dp, "id");
 
   auto isMatchMap = boost::get(&BoostTAState<SignalVariables>::isInit, BoostTA);
@@ -464,5 +461,5 @@ void parseTSAM(std::istream &file, TSAM<SignalVariables, ClockVariables, MemoryV
   }
 
   boost::set_property(BoostTA, boost::graph_num_of_vars, num_of_vars);
-  boost::set_property(BoostTA, boost::graph_num_of_vars, num_of_memories);
+  boost::set_property(BoostTA, boost::graph_num_of_memories, num_of_memories);
 }
