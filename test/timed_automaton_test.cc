@@ -238,6 +238,8 @@ BOOST_AUTO_TEST_CASE(parsePhi7Test)
 
   const auto num_of_vars = boost::get_property(TA, boost::graph_num_of_vars);
   BOOST_CHECK_EQUAL(num_of_vars, 1);
+  const auto num_of_memories = boost::get_property(TA, boost::graph_num_of_memories);
+  BOOST_CHECK_EQUAL(num_of_memories, 2);
 
   BOOST_TEST(!TA[0].isMatch);
   BOOST_TEST(!TA[1].isMatch);

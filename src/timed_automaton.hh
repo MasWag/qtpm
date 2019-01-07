@@ -97,6 +97,7 @@ namespace boost{
   enum graph_init_states_t {graph_init_states};
   enum graph_num_of_vars_t {graph_num_of_vars};
   enum graph_max_constraints_t {graph_max_constraints};
+  enum graph_num_of_memories_t {graph_num_of_memories};
 
   BOOST_INSTALL_PROPERTY(vertex, match);
   BOOST_INSTALL_PROPERTY(edge, reset);
@@ -376,7 +377,8 @@ using BoostTimedAutomaton = boost::adjacency_list<boost::listS, boost::vecS, boo
 */
 template<class SignalVariables, class ClockVariables, class MemoryVariables>
 using TSAM = boost::adjacency_list<boost::listS, boost::vecS, boost::directedS, TAStateMemory, TATransitionMemory<ClockVariables, MemoryVariables>, 
-                                   boost::property<boost::graph_num_of_vars_t, std::size_t>>;
+                                   boost::property<boost::graph_num_of_vars_t, std::size_t,
+                                                   boost::property<boost::graph_num_of_memories_t, std::size_t>>>;
 
 template<class SignalVariables, class ClockVariables>
 static inline 
@@ -443,12 +445,18 @@ void parseTSAM(std::istream &file, TSAM<SignalVariables, ClockVariables, MemoryV
   }
 
   std::size_t num_of_vars = 0;
+  std::size_t num_of_memories = 0;
   for (auto range = boost::edges(BoostTA); range.first != range.second; range.first++) {
     auto guard = BoostTA[*range.first].guard;
-    for (auto g: guard) {
+    for (const auto &g: guard) {
       num_of_vars = std::max<std::size_t>(num_of_vars, g.x + 1);
+    }
+    auto assigns = BoostTA[*range.first].assigns;
+    for (const auto &assign: assigns.assignVars) {
+      num_of_memories = std::max<std::size_t>(num_of_memories, assign.first + 1);
     }
   }
 
   boost::set_property(BoostTA, boost::graph_num_of_vars, num_of_vars);
+  boost::set_property(BoostTA, boost::graph_num_of_vars, num_of_memories);
 }
