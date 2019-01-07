@@ -17,5 +17,5 @@ digraph G {
         1->1 [guard="{x0 < 4}"];
 
         1->2 [guard="{x0 < 4}"];
-        2->2[assign="{m1 := x0}"];
+        2->2 [assign="{m1 := x0}"];
 }
