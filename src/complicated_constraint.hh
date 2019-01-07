@@ -259,7 +259,6 @@ static inline
 std::ostream& operator<<(std::ostream& os, const Expression::kind_t kind)
 {
   switch (kind) {
-  enum class kind_t {INT, DVAR, MVAR, PLUS, MINUS, TIMES} kind;
   case Expression::kind_t::INT: 
     break;
   case Expression::kind_t::DVAR:
