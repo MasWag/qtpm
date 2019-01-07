@@ -135,30 +135,6 @@ static inline std::shared_ptr<ComplicatedConstraint> operator>(std::shared_ptr<E
   return std::make_shared<ComplicatedConstraint>(first, ComplicatedConstraint::kind_t::GT, second);
 }
 
-__attribute__((unused))
-static inline std::ostream& operator<<(std::ostream& os, const ComplicatedConstraint &cs) {
-  os << cs.first;
-  switch (cs.kind) {
-  case ComplicatedConstraint::kind_t::LT:
-    os << " < ";
-    break;
-  case ComplicatedConstraint::kind_t::LE:
-    os << " <= ";
-    break;
-  case ComplicatedConstraint::kind_t::EQ:
-    os << " == ";
-    break;
-  case ComplicatedConstraint::kind_t::GE:
-    os << " >= ";
-    break;
-  case ComplicatedConstraint::kind_t::GT:
-    os << " > ";
-    break;
-  }
-  os << cs.second;  
-  return os;
-}
-
 /*!
   @brief Boolean Constraint at the states
 */
@@ -215,21 +191,53 @@ static inline std::shared_ptr<BooleanConstraint> operator!(std::shared_ptr<Boole
   return std::make_shared<BooleanConstraint>(BooleanConstraint::kind_t::NOT, child);
 }
 
+
 __attribute__((unused))
 static inline 
-std::ostream& operator<<(std::ostream& os, const BooleanConstraint::kind_t kind)
+std::ostream& operator<<(std::ostream& os, const Expression::kind_t kind)
 {
   switch (kind) {
-  case BooleanConstraint::kind_t::ATOM:
+  case Expression::kind_t::INT: 
     break;
-  case BooleanConstraint::kind_t::AND: 
-    os << "&&";
+  case Expression::kind_t::DVAR:
+    os << "x";
     break;
-  case BooleanConstraint::kind_t::OR: 
-    os << "||";
+  case Expression::kind_t::MVAR: 
+    os << "m";
     break;
-  case BooleanConstraint::kind_t::NOT:
-    os << "!";
+  case Expression::kind_t::PLUS: 
+    os << "+";
+    break;
+  case Expression::kind_t::MINUS: 
+    os << "-";
+    break;
+  case Expression::kind_t::TIMES:
+    os << "*";
+    break;
+  }
+
+  return os;
+}
+
+__attribute__((unused))
+static inline 
+std::ostream& operator<<(std::ostream& os, const Expression &expr)
+{
+  switch (expr.kind) {
+  case Expression::kind_t::INT:
+    os << expr.constant;
+    break;
+  case Expression::kind_t::DVAR:
+  case Expression::kind_t::MVAR:
+    os << expr.kind;
+    os << expr.variable;
+    break;
+  case Expression::kind_t::PLUS:
+  case Expression::kind_t::MINUS:
+  case Expression::kind_t::TIMES:
+    os << *(expr.children.first);
+    os << expr.kind;
+    os << *(expr.children.second);
     break;
   }
 
@@ -263,25 +271,53 @@ std::ostream& operator<<(std::ostream& os, const ComplicatedConstraint::kind_t k
 
 __attribute__((unused))
 static inline 
-std::ostream& operator<<(std::ostream& os, const Expression::kind_t kind)
+std::ostream& operator<<(std::ostream& os, const ComplicatedConstraint &constraint)
+{
+  os << *(constraint.first);
+  os << constraint.kind;
+  os << *(constraint.second);
+
+  return os;
+}
+
+__attribute__((unused))
+static inline 
+std::ostream& operator<<(std::ostream& os, const BooleanConstraint::kind_t kind)
 {
   switch (kind) {
-  case Expression::kind_t::INT: 
+  case BooleanConstraint::kind_t::ATOM:
     break;
-  case Expression::kind_t::DVAR:
-    os << "x";
+  case BooleanConstraint::kind_t::AND: 
+    os << "&&";
     break;
-  case Expression::kind_t::MVAR: 
-    os << "m";
+  case BooleanConstraint::kind_t::OR: 
+    os << "||";
     break;
-  case Expression::kind_t::PLUS: 
-    os << "+";
+  case BooleanConstraint::kind_t::NOT:
+    os << "!";
     break;
-  case Expression::kind_t::MINUS: 
-    os << "-";
+  }
+
+  return os;
+}
+
+__attribute__((unused))
+static inline 
+std::ostream& operator<<(std::ostream& os, const BooleanConstraint &constraint)
+{
+  switch (constraint.kind) {
+  case BooleanConstraint::kind_t::ATOM:
+    os << *(constraint.atom);
     break;
-  case Expression::kind_t::TIMES:
-    os << "*";
+  case BooleanConstraint::kind_t::AND: 
+  case BooleanConstraint::kind_t::OR: 
+    os << *(constraint.children.first);
+    os << constraint.kind;
+    os << *(constraint.children.second);
+    break;
+  case BooleanConstraint::kind_t::NOT:
+    os << "!";
+    os << *(constraint.child);
     break;
   }
 

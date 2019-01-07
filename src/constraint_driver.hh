@@ -55,10 +55,11 @@ public:
 private:
   std::shared_ptr<BooleanConstraint> result;
   bool parse_helper( std::istream &stream) {
+    result.reset();
     ConstraintScanner scanner(&stream);
     Freezing::ConstraintParser parser( scanner /* scanner */, 
-                             (*this) /* driver */
-                             );
+                                       (*this) /* driver */
+                                       );
 
     return parser.parse() == 0;
   }

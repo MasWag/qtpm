@@ -47,6 +47,7 @@ add_executable(unit_test
   test/dbm_test.cc
   test/semiring_test.cc
   test/warshall_froid_test.cc
+  test/constraint_driver_test.cc
   test/robustness_test.cc
   test/quantitative_timed_pattern_matching_test.cc
   ${FLEX_constraint_lexer_OUTPUTS}

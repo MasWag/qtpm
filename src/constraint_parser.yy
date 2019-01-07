@@ -62,10 +62,10 @@
 
 unit : boolean END { driver.result = $1; }
 
-boolean : constraint { $$ = std::make_shared<BooleanConstraint>(BooleanConstraint::kind_t::ATOM, $1); }
-        | boolean OR boolean { $$ = $1 || $3; }
+boolean : boolean OR boolean { $$ = $1 || $3; }
         | boolean AND boolean { $$ = $1 && $3; }
         | NOT boolean { $$ = !$2; }
+        | constraint { $$ = std::make_shared<BooleanConstraint>(BooleanConstraint::kind_t::ATOM, $1); }
 
 /* The order matters */
 constraint : expr LT expr { $$ = $1 < $3; }
