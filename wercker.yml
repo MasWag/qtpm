@@ -7,6 +7,10 @@ build:
         code: |
           mkdir build
           cd build && cmake .. && make
+    - script:
+        name: clean
+        code: |
+          rm -rf build
 gcc_unit_test:
   steps:
     - script:
@@ -17,8 +21,12 @@ gcc_unit_test:
     - script:
         name: build_and_test
         code: |
-          mkdir gcc_build
-          cd gcc_build && cmake .. && make && make test
+          mkdir build
+          cd build && cmake .. && make && make test
+    - script:
+        name: clean
+        code: |
+          rm -rf build
 clang_unit_test:
   steps:
     - script:
@@ -29,5 +37,9 @@ clang_unit_test:
     - script:
         name: build_and_test
         code: |
-          mkdir gcc_build
-          cd gcc_build && cmake .. && make && make test
+          mkdir build
+          cd build && cmake .. && make && make test
+    - script:
+        name: clean
+        code: |
+          rm -rf build
