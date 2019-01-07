@@ -315,6 +315,9 @@ std::ostream& operator<<(std::ostream& os, const ResetVars<ClockVariables>& rese
 static inline 
 std::istream& operator>>(std::istream& is, std::shared_ptr<BooleanConstraint>& guard)
 {
+  std::unique_ptr<ConstraintDriver> driver = std::make_unique<ConstraintDriver>();
+  driverRef = std::move(driver);
+
   driverRef->parse(is);
   guard = driverRef->getResult();
 
@@ -433,6 +436,9 @@ void parseTSAM(std::istream &file, TSAM<SignalVariables, ClockVariables, MemoryV
   dp.property("reset", boost::get(&TATransitionMemory<ClockVariables, MemoryVariables>::resetVars, BoostTA));
   dp.property("assign", boost::get(&TATransitionMemory<ClockVariables, MemoryVariables>::assigns, BoostTA));
   dp.property("guard", boost::get(&TATransitionMemory<ClockVariables, MemoryVariables>::guard, BoostTA));
+
+  std::unique_ptr<ConstraintDriver> driver = std::make_unique<ConstraintDriver>();
+  driverRef = std::move(driver);
 
   boost::read_graphviz(file, BoostTA, dp);
 
