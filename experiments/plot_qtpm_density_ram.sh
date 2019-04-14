@@ -10,6 +10,6 @@ gnuplot <<EOF
 load 'common.plt'
 set output "$2"
 set xlabel 'Sampling Frequency [Hz]'
-set ylabel 'Memory Usage [KB]'
-plot "$1" u (6000/\$1):3 w lp title '\textsc{Overshoot}',  "$1" u (6000/\$1):5 w lp title '\textsc{Ringing}'
+set ylabel 'Memory Usage [MB]'
+plot "$1" u (6000/\$1):(\$3/1024) with lp lw 5 pt 2 ps 2 title '\textsc{Overshoot}',  "$1" u (6000/\$1):(\$5/1024) with lp lw 5 pt 7 ps 2 title '\textsc{Ringing}'
 EOF

@@ -11,5 +11,5 @@ load 'common.plt'
 set output "$2"
 set xlabel 'Sampling Frequency [Hz]'
 set ylabel 'Execution Time [s]'
-plot "$1" u (6000/\$1):2 w lp title '\textsc{Overshoot}',  "$1" u (6000/\$1):4 w lp title '\textsc{Ringing}'
+plot "$1" u (6000/\$1):2 with lp lw 5 pt 2 ps 2 title '\textsc{Overshoot}',  "$1" u (6000/\$1):4 with lp lw 5 pt 7 ps 2 title '\textsc{Ringing}'
 EOF

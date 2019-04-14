@@ -9,7 +9,7 @@ fi
 gnuplot <<EOF
 load 'common.plt'
 set output "$2"
-set xlabel 'Duration of the Signal [s]'
-set ylabel 'Execution Time [s]'
-plot "$1" u 1:2 w lp title '\textsc{Overshoot}',  "$1" u 1:4 w lp title '\textsc{Ringing}'
+set xlabel 'Duration of the signal [100,000 s]'
+set ylabel 'Execution time [s]'
+plot "$1" u (\$1/100000):2 with lp lw 5 pt 2 ps 2 title '\textsc{Overshoot}',  "$1" u (\$1/100000):4 with lp lw 5 pt 7 ps 2 title '\textsc{Ringing}'
 EOF

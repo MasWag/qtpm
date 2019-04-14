@@ -9,7 +9,7 @@ fi
 gnuplot <<EOF
 load 'common.plt'
 set output "$2"
-set xlabel 'Duration of the Signal [s]'
-set ylabel 'Memory Usage [KB]'
-plot "$1" u 1:3 w lp title '\textsc{Overshoot}',  "$1" u 1:5 w lp title '\textsc{Ringing}'
+set xlabel 'Duration of the signal [100,000 s]'
+set ylabel 'Memory Usage [MB]'
+plot "$1" u (\$1/100000):(\$3/1024) with lp lw 5 pt 2 ps 2 title '\textsc{Overshoot}',  "$1" u (\$1/100000):(\$5/1024) with lp lw 5 pt 7 ps 2 title '\textsc{Ringing}'
 EOF
