@@ -4,11 +4,9 @@ echo 'set sample 300'
 echo 'set isosample 300,300'
 echo 'set pm3d map'
 echo 'set size ratio -1'
-echo 'set grid on'
-#echo 'set xlabel font "Arial,20"'
-#echo 'set ylabel font "Arial,20"'
-#echo 'set xlabel "t"'
-#echo "set ylabel \"t'\""
+echo 'set grid lw 2'
+echo 'set xlabel "t" font "XITS,40" offset 8.0,2.2'
+echo "set ylabel \"t'\" font \"XITS,40\" offset 1.3,2.7 rotate by 0"
 
 echo "set palette defined ( -30 '#66FFFF', 10 '#000099')"
 sed '/===/ d;s/----*//g;s/Weight://;s/$/ \&\&/' |
