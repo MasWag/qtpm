@@ -9,7 +9,7 @@ fi
 gnuplot <<EOF
 load 'common.plt'
 set output "$2"
-set xlabel 'Duration of the signal [1,000 s]'
-set ylabel 'Memory Usage [MB]'
+set xlabel 'Number of entries of the signal [$\times 100$]'
+set ylabel 'Memory Usage [MiB]'
 plot "$1" u (\$1/1000):(\$3/1024) with lp lw 5 pt 3 ps 2 lc 3 title '\textsc{Overshoot (Unbounded)}'
 EOF
