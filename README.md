@@ -1,6 +1,10 @@
-# Quantitative Timed Pattern Matching [![wercker status](https://app.wercker.com/status/f1121fad1e4e172db519adf0da6d07f4/s/master "wercker status")](https://app.wercker.com/project/byKey/f1121fad1e4e172db519adf0da6d07f4)
+Quantitative Timed Pattern Matching
+===================================
 
-This is our experimental implementation of *Quantitative Timed Pattern Matching* (Paper is not yet).
+[![wercker status](https://app.wercker.com/status/f1121fad1e4e172db519adf0da6d07f4/s/master "wercker status")](https://app.wercker.com/project/byKey/f1121fad1e4e172db519adf0da6d07f4)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](./LICENSE)
+
+This is our experimental implementation of *Quantitative Timed Pattern Matching*.
 
 Usage
 -----
@@ -47,3 +51,8 @@ Input Format
 A signal is a sequence of the following line.
 
      time v(x1) v(x2) v(x3) ... v(xn)
+
+Reference
+---------
+
+- [Masaki Waga](http://group-mmm.org/~mwaga/), **Online Quantitative Timed Pattern Matching with Semiring-Valued Weighted Automata**, To appear in *Proc. [FORMATS 2019](https://lipn.univ-paris13.fr/formats2019/)*. [arXiv version](https://arxiv.org/abs/1906.12133)
