@@ -1,6 +1,8 @@
 Evaluation
 ==========
 
+See [FORMATS2019.md](./FORMATS2019.md) for the experiments in our FORMATS 2019 paper.
+
 The Data Set We Use
 -------------------
 
