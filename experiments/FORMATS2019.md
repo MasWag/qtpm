@@ -2,7 +2,7 @@ Experiments Data for FORMATS 2019
 =============================
 
 This is a document on the experiment data for the FORMATS 2019 paper [Waga19].
-We implemented and evaluated our tool SyMon. We compiled SyMon using GCC 4.9.3. See also [READMD.md](../README.md).
+We compiled using GCC 4.9.3. See also [README.md](../README.md).
 
 Experimental raw data
 ---------------------
@@ -55,3 +55,4 @@ Online Quantitative Timed Pattern Matching with Semiring-Valued Weighted Automat
 <dt>[KJD+16]</dt>
 <dd>James Kapinski, Xiaoqing Jin, Jyotirmoy Deshmukh, Alexandre Donze, To- moya Yamaguchi, Hisahiro Ito, Tomoyuki Kaga, Shunsuke Kobuna, and Sanjit Seshia. St-lib: a library for specifying and classifying model behav- iors. Technical report, SAE Technical Paper, 2016.</dd>
 </dl>
+

@@ -5,6 +5,7 @@ Quantitative Timed Pattern Matching
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](./LICENSE)
 
 This is our experimental implementation of *Quantitative Timed Pattern Matching*.
+See [FORMATS2019.md](./experiments/FORMATS2019.md) for the experiments in our FORMATS 2019 paper.
 
 Usage
 -----
@@ -55,4 +56,4 @@ A signal is a sequence of the following line.
 Reference
 ---------
 
-- [Masaki Waga](http://group-mmm.org/~mwaga/), **Online Quantitative Timed Pattern Matching with Semiring-Valued Weighted Automata**, To appear in *Proc. [FORMATS 2019](https://lipn.univ-paris13.fr/formats2019/)*. [arXiv version](https://arxiv.org/abs/1906.12133)
+- [Masaki Waga](http://group-mmm.org/~mwaga/), **Online Quantitative Timed Pattern Matching with Semiring-Valued Weighted Automata**, In *Proc. [FORMATS 2019](https://lipn.univ-paris13.fr/formats2019/)*, LNCS 11750, pp. 3-22 **(Best paper awarded)**. [arXiv version](https://arxiv.org/abs/1906.12133)
