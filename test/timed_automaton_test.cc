@@ -33,6 +33,50 @@ BOOST_AUTO_TEST_CASE(parseBoostPhi7TATest)
   BOOST_CHECK_EQUAL(boost::get(&BoostTATransition<ClockVariables>::guard, TA, transition).size(), 0);
 }
 
+BOOST_AUTO_TEST_CASE(parseVelocityBoostTATest)
+{
+  using SignalVariables = uint8_t;
+  using ClockVariables = uint8_t;
+  BoostTimedAutomaton<SignalVariables, ClockVariables> TA;
+  std::ifstream file("../test/velocity.dot");
+  std::vector<typename BoostTimedAutomaton<SignalVariables, ClockVariables>::vertex_descriptor> initStates;
+  parseBoostTA(file, TA, initStates);
+
+  const auto max_constraints = boost::get_property(TA, boost::graph_max_constraints);
+  const auto num_of_vars = boost::get_property(TA, boost::graph_num_of_vars);
+  BOOST_CHECK_EQUAL(max_constraints, 200);
+  BOOST_CHECK_EQUAL(num_of_vars, 1);
+
+  BOOST_TEST(!TA[3].isMatch);
+  BOOST_TEST(!TA[1].isMatch);
+  BOOST_TEST(!TA[2].isMatch);
+  BOOST_TEST( TA[0].isMatch);
+  
+  BOOST_TEST( TA[3].isInit);
+  BOOST_TEST( TA[1].isInit);
+  BOOST_TEST(!TA[2].isInit);
+  BOOST_TEST(!TA[0].isInit);
+
+  BOOST_CHECK_EQUAL(TA[3].label.size(), 1);
+  BOOST_CHECK_EQUAL(TA[1].label.size(), 1);
+  BOOST_CHECK_EQUAL(TA[2].label.size(), 1);
+  BOOST_CHECK_EQUAL(TA[0].label.size(), 0);
+  auto transition = boost::edge(boost::vertex(1, TA), boost::vertex(2, TA), TA).first;
+
+  BOOST_CHECK_EQUAL(boost::get(&BoostTATransition<ClockVariables>::resetVars, TA, transition).resetVars.size(), 0);
+  BOOST_CHECK_EQUAL(boost::get(&BoostTATransition<ClockVariables>::guard, TA, transition).size(), 1);
+
+  transition = boost::edge(boost::vertex(2, TA), boost::vertex(0, TA), TA).first;
+
+  BOOST_CHECK_EQUAL(boost::get(&BoostTATransition<ClockVariables>::resetVars, TA, transition).resetVars.size(), 0);
+  BOOST_CHECK_EQUAL(boost::get(&BoostTATransition<ClockVariables>::guard, TA, transition).size(), 1);
+
+  transition = boost::edge(boost::vertex(3, TA), boost::vertex(0, TA), TA).first;
+
+  BOOST_CHECK_EQUAL(boost::get(&BoostTATransition<ClockVariables>::resetVars, TA, transition).resetVars.size(), 0);
+  BOOST_CHECK_EQUAL(boost::get(&BoostTATransition<ClockVariables>::guard, TA, transition).size(), 1);
+}
+
 BOOST_AUTO_TEST_CASE(parseBoostTATest)
 {
   using SignalVariables = uint8_t;

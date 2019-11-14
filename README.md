@@ -5,7 +5,9 @@ Quantitative Timed Pattern Matching
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](./LICENSE)
 
 This is our experimental implementation of *Quantitative Timed Pattern Matching*.
-See [FORMATS2019.md](./experiments/FORMATS2019.md) for the experiments in our FORMATS 2019 paper.
+See [FORMATS2019.md](./experiments/README.md) for the experiments in our FORMATS 2019 paper.
+
+Demo on Google Colab is [HERE](https://colab.research.google.com/drive/1y1LU0pKQb5rMcuwwA9VwEb5Ec8I2qvlf)!!
 
 Usage
 -----

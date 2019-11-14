@@ -1,0 +1,9 @@
+digraph G {
+        notLow [label="{x0 > 30}",  init=1, match=0];
+        low    [label="{x0 <= 30}", init=1, match=0];
+        middle [label="{x0 <= 50}", init=0, match=0];
+        end    [init=0, match=1];
+        low->middle [guard="{x0 < 200}"]; 
+        middle->end [guard="{x0 < 200}"];
+        notLow->end [guard="{x0 < 200}"];
+}

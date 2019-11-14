@@ -99,6 +99,7 @@ public:
 template<class Base>
 std::ostream& operator<<(std::ostream& os, const MaxMinSemiring<Base>& s) {
   os << s.data;
+  return os;
 }
 
 template<typename Base>
