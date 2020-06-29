@@ -55,6 +55,14 @@ A signal is a sequence of the following line.
 
      time v(x1) v(x2) v(x3) ... v(xn)
 
+How to make compile_commands.json
+---------------------------------
+
+``` shell
+mkdir build
+cd build && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+```
+
 Reference
 ---------
 

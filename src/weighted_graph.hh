@@ -7,14 +7,6 @@ using WeightedGraph = boost::adjacency_list<boost::listS, boost::listS, boost::d
 
 template<typename Base>
 class MinPlusSemiring {
-  inline MinPlusSemiring safe_sum(const MinPlusSemiring& x) const {
-    const auto d = data + x.data;
-    if (d < data && d < x.data) {
-      return zero();
-    } else {
-      return MinPlusSemiring{d};
-    }
-  }
 public:
   Base data;
   MinPlusSemiring (Base data = 0): data(data) {}
@@ -25,10 +17,10 @@ public:
      data = std::min(data, x.data);
   }
   MinPlusSemiring operator*(const MinPlusSemiring& x) const {
-    return safe_sum(x);
+    return MinPlusSemiring( data + x.data);
   }
   void operator*=(const MinPlusSemiring& x) {
-    data = safe_sum(x).data;
+    data += x;
   }
   bool operator!=(const MinPlusSemiring& x) const {
     return data != x.data;
@@ -47,12 +39,67 @@ public:
     return one;
   }
   MinPlusSemiring star() const {
-    return one();
+    if (data < 0) {
+      return MinPlusSemiring{ std::numeric_limits<Base>::has_infinity ?
+                               -std::numeric_limits<Base>::infinity():  
+                               std::numeric_limits<Base>::min() };
+    } else {
+      return one();
+    }
   }  
 };
 
 template<typename Base>
 std::size_t hash_value(MinPlusSemiring<Base> const& v) {
+  return boost::hash_value(v.data);
+}
+
+template<typename Base>
+class MaxPlusSemiring {
+public:
+  Base data;
+  MaxPlusSemiring (Base data = 0): data(data) {}
+  MaxPlusSemiring operator+(const MaxPlusSemiring& x) const {
+    return MaxPlusSemiring{ std::max(data, x.data) };
+  }
+  void operator+=(const MaxPlusSemiring& x) {
+     data = std::max(data, x.data);
+  }
+  MaxPlusSemiring operator*(const MaxPlusSemiring& x) const {
+    return MaxPlusSemiring{data + x.data};
+  }
+  void operator*=(const MaxPlusSemiring& x) {
+    data += x;
+  }
+  bool operator!=(const MaxPlusSemiring& x) const {
+    return data != x.data;
+  }
+  bool operator==(const MaxPlusSemiring& x) const {
+    return data == x.data;
+  }
+  static  MaxPlusSemiring zero() {
+    static MaxPlusSemiring zero = MaxPlusSemiring{ std::numeric_limits<Base>::has_infinity ?
+                                                   -std::numeric_limits<Base>::infinity():  
+                                                   std::numeric_limits<Base>::min() };
+    return zero;
+  }
+  static MaxPlusSemiring one() {
+    static MaxPlusSemiring one = MaxPlusSemiring{ 0 };
+    return one;
+  }
+  MaxPlusSemiring star() const {
+    if (data > 0) {
+      return MaxPlusSemiring{ std::numeric_limits<Base>::has_infinity ?
+                               std::numeric_limits<Base>::infinity():  
+                               std::numeric_limits<Base>::max() };
+    } else {
+      return one();
+    }
+  }
+};
+
+template<typename Base>
+std::size_t hash_value(MaxPlusSemiring<Base> const& v) {
   return boost::hash_value(v.data);
 }
 

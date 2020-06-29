@@ -108,7 +108,8 @@ int main(int argc, char *argv[])
     ("automaton,f", value<std::string>(&timedAutomatonFileName)->default_value(""),"input file of timed symbolic automaton")
     ("abs,a", "absolute time mode")
     ("maxmin", "use maxmin semiring space robustness (default)")
-    ("minplus", "use minplus semiring space robustness");
+    ("minplus", "use minplus semiring space robustness")
+    ("maxplus", "use maxplus semiring space robustness");
 
   command_line_parser parser(argc, argv);
   parser.options(visible);
@@ -144,6 +145,11 @@ int main(int argc, char *argv[])
   // TODO: branching by semirings
   if (vm.count("minplus")) {
     using Weight = MinPlusSemiring<Value>;
+    std::function<Weight(const std::vector<Constraint<ClockVariables>> &,const std::vector<std::vector<Value>> &)> cost = multipleSpaceRobustness<Weight, Value, ClockVariables>;
+    QuantitativeTimedPatternMatching<SignalVariables, ClockVariables, Weight, Value> qtpm(TA, initStates, cost);
+    QTPM(qtpm, file, stdout, vm.count("quiet"), vm.count("abs"));
+  } else if (vm.count("maxplus")) {
+    using Weight = MaxPlusSemiring<Value>;
     std::function<Weight(const std::vector<Constraint<ClockVariables>> &,const std::vector<std::vector<Value>> &)> cost = multipleSpaceRobustness<Weight, Value, ClockVariables>;
     QuantitativeTimedPatternMatching<SignalVariables, ClockVariables, Weight, Value> qtpm(TA, initStates, cost);
     QTPM(qtpm, file, stdout, vm.count("quiet"), vm.count("abs"));
