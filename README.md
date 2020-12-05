@@ -23,9 +23,11 @@ Usage
 **-V**, **--version** Print the version <br />
 **-i** *file*, **--input** *file* Read a signal from *file*. <br />
 **-f** *file*, **--automaton** *file* Read a timed automaton from *file*. <br />
-**-a**, **--abs** absolute time mode
+**-a**, **--abs** absolute time mode. <br />
 **--maxmin**  Use max-min semiring robust semantics (default). <br />
-**--minplus**  Use min-plus semiring robust semantics . <br />
+**--minplus**  Use min-plus semiring robust semantics. <br />
+**--maxplus**  Use max-plus semiring robust semantics. <br />
+**--boolean**  Use boolean semantics. <br />
 
 Installation
 ------------
