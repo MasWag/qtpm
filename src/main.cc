@@ -52,6 +52,44 @@ static inline int getOne(FILE* file, double &time, std::vector<Value> &valuation
   return valuation.size() + 1;
 }
 
+template<class RawWeight>
+void printResult(FILE* fout, std::array<Bounds, 6> arr, RawWeight weight) {
+  fprintf(fout, "----- Weight: %lf -----\n", weight);
+  fprintf(fout, "%10lf %8s t %s %10lf\n", -arr[0].first,
+          (arr[0].second ? "<=" : "<"),
+          (arr[1].second ? "<=" : "<"),
+          arr[1].first);
+  fprintf(fout, "%10lf %8s t' %s %10lf\n", -arr[2].first,
+          (arr[2].second ? "<=" : "<"),
+          (arr[3].second ? "<=" : "<"),
+          arr[3].first);
+  fprintf(fout, "%10lf %8s t' - t %s %10lf\n", -arr[4].first,
+          (arr[4].second ? "<=" : "<"),
+          (arr[5].second ? "<=" : "<"),
+          arr[5].first);
+  fputs("=============================\n", fout);
+}
+
+template<>
+void printResult<bool>(FILE* fout, std::array<Bounds, 6> arr, bool weight) {
+  if (weight) {
+    fprintf(fout, "%10lf %8s t %s %10lf\n", -arr[0].first,
+            (arr[0].second ? "<=" : "<"),
+            (arr[1].second ? "<=" : "<"),
+            arr[1].first);
+    fprintf(fout, "%10lf %8s t' %s %10lf\n", -arr[2].first,
+            (arr[2].second ? "<=" : "<"),
+            (arr[3].second ? "<=" : "<"),
+            arr[3].first);
+    fprintf(fout, "%10lf %8s t' - t %s %10lf\n", -arr[4].first,
+            (arr[4].second ? "<=" : "<"),
+            (arr[5].second ? "<=" : "<"),
+            arr[5].first);
+    fputs("=============================\n", fout);
+  }
+}
+
+
 template<class SignalVariables, class ClockVariables, class Weight, class Value>
 static inline void QTPM(QuantitativeTimedPatternMatching<SignalVariables, ClockVariables, Weight, Value> &qtpm, FILE* fin, FILE* fout, bool quiet, bool isAbsTime) {
   flockfile(fin);
@@ -72,20 +110,7 @@ static inline void QTPM(QuantitativeTimedPatternMatching<SignalVariables, ClockV
       std::array<Bounds, 6> arr;
       Weight weight;
       BOOST_FOREACH(std::tie(arr, weight), result) {
-        fprintf(fout, "----- Weight: %lf -----\n", weight.data);
-        fprintf(fout, "%10lf %8s t %s %10lf\n", -arr[0].first,
-               (arr[0].second ? "<=" : "<"),
-               (arr[1].second ? "<=" : "<"),
-               arr[1].first);
-        fprintf(fout, "%10lf %8s t' %s %10lf\n", -arr[2].first,
-               (arr[2].second ? "<=" : "<"),
-               (arr[3].second ? "<=" : "<"),
-               arr[3].first);
-        fprintf(fout, "%10lf %8s t' - t %s %10lf\n", -arr[4].first,
-               (arr[4].second ? "<=" : "<"),
-               (arr[5].second ? "<=" : "<"),
-               arr[5].first);
-        fputs("=============================\n", fout);
+        printResult(fout, arr, weight.data);
       }
     }
     result.clear();
@@ -109,7 +134,8 @@ int main(int argc, char *argv[])
     ("abs,a", "absolute time mode")
     ("maxmin", "use maxmin semiring space robustness (default)")
     ("minplus", "use minplus semiring space robustness")
-    ("maxplus", "use maxplus semiring space robustness");
+    ("maxplus", "use maxplus semiring space robustness")
+    ("boolean", "use boolean semiring space robustness");
 
   command_line_parser parser(argc, argv);
   parser.options(visible);
@@ -150,6 +176,11 @@ int main(int argc, char *argv[])
     QTPM(qtpm, file, stdout, vm.count("quiet"), vm.count("abs"));
   } else if (vm.count("maxplus")) {
     using Weight = MaxPlusSemiring<Value>;
+    std::function<Weight(const std::vector<Constraint<ClockVariables>> &,const std::vector<std::vector<Value>> &)> cost = multipleSpaceRobustness<Weight, Value, ClockVariables>;
+    QuantitativeTimedPatternMatching<SignalVariables, ClockVariables, Weight, Value> qtpm(TA, initStates, cost);
+    QTPM(qtpm, file, stdout, vm.count("quiet"), vm.count("abs"));
+  } else if (vm.count("boolean")) {
+    using Weight = BooleanSemiring;
     std::function<Weight(const std::vector<Constraint<ClockVariables>> &,const std::vector<std::vector<Value>> &)> cost = multipleSpaceRobustness<Weight, Value, ClockVariables>;
     QuantitativeTimedPatternMatching<SignalVariables, ClockVariables, Weight, Value> qtpm(TA, initStates, cost);
     QTPM(qtpm, file, stdout, vm.count("quiet"), vm.count("abs"));

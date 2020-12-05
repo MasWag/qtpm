@@ -153,3 +153,46 @@ template<typename Base>
 std::size_t hash_value(MaxMinSemiring<Base> const& v) {
   return boost::hash_value(v.data);
 }
+
+class BooleanSemiring {
+public:
+  bool data;
+  BooleanSemiring (bool data = false): data(data) {}
+  BooleanSemiring operator+(const BooleanSemiring& x) const {
+    return BooleanSemiring{ data || x.data };
+  }
+  void operator+=(const BooleanSemiring& x) {
+     data = data || x.data;
+  }
+  BooleanSemiring operator*(const BooleanSemiring& x) const {
+    return BooleanSemiring( data && x.data);
+  }
+  void operator*=(const BooleanSemiring& x) {
+    data = data && x.data;
+  }
+  bool operator!=(const BooleanSemiring& x) const {
+    return data != x.data;
+  }
+  bool operator==(const BooleanSemiring& x) const {
+    return data == x.data;
+  }
+  static  BooleanSemiring zero() {
+    static BooleanSemiring zero = BooleanSemiring{ false };
+    return zero;
+  }
+  static BooleanSemiring one() {
+    static BooleanSemiring one = BooleanSemiring{ true };
+    return one;
+  }
+  BooleanSemiring star() const {
+    if (data == true) {
+      return one();
+    } else {
+      return zero();
+    }
+  }  
+};
+
+static inline std::size_t hash_value(BooleanSemiring const& v) {
+  return boost::hash_value(v.data);
+}
