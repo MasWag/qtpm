@@ -64,7 +64,8 @@ public:
 
   QuantitativeTimedPatternMatching(const TimedAutomaton &TA,
                                    const std::vector<TAState> &initStates,
-                                   const std::function<Weight(const std::vector<Constraint<ClockVariables>> &,const std::vector<std::vector<Value>> &)> &cost) : numOfClockVariables(boost::get_property(TA, boost::graph_num_of_vars)), TA(TA), initStates(initStates), cost(cost) {
+                                   const std::function<Weight(const std::vector<Constraint<ClockVariables>> &,const std::vector<std::vector<Value>> &)> &cost,
+                                   const bool ignoreZero = false) : numOfClockVariables(boost::get_property(TA, boost::graph_num_of_vars)), TA(TA), initStates(initStates), cost(cost) {
     DBM z = DBM::zero(numOfClockVariables + 1 + 2);
     // release Z(N+2)
     z.M = Bounds(std::numeric_limits<double>::infinity(), false);
@@ -114,6 +115,9 @@ public:
     boost::unordered_map<ConfTuple_t, std::list<DBM>> confMap;
 
     for (auto w: distance) {
+      if (w.second == Weight::zero()) {
+        continue;
+      }
       if (!TA[ZG[w.first].vertex].isMatch && ZG[w.first].zone.value.cols() > 0) {
         auto z = ZG[w.first].zone;
         z.tightenWithoutClose(-1, numOfClockVariables + 2 - 1, Bounds{-duration, true});
@@ -165,6 +169,9 @@ public:
     }
 
     for (auto &w: distance) {
+      if (w.second == Weight::zero()) {
+        continue;
+      }
       if (TA[ZG[w.first].vertex].isMatch && !ZG[w.first].jumpable && ZG[w.first].zone.value.cols() > 0) {
         //        assert(ZG[w.first].zone.isSatisfiable());
         ResultMatrix mat = {{ZG[w.first].zone.value(numOfClockVariables + 2 - 1, numOfClockVariables + 2) - absTime,

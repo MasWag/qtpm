@@ -135,7 +135,8 @@ int main(int argc, char *argv[])
     ("maxmin", "use maxmin semiring space robustness (default)")
     ("minplus", "use minplus semiring space robustness")
     ("maxplus", "use maxplus semiring space robustness")
-    ("boolean", "use boolean semiring space robustness");
+    ("boolean", "use boolean semiring space robustness")
+    ("ignore-zero", "Ignore zero of the semiring");
 
   command_line_parser parser(argc, argv);
   parser.options(visible);
@@ -172,22 +173,22 @@ int main(int argc, char *argv[])
   if (vm.count("minplus")) {
     using Weight = MinPlusSemiring<Value>;
     std::function<Weight(const std::vector<Constraint<ClockVariables>> &,const std::vector<std::vector<Value>> &)> cost = multipleSpaceRobustness<Weight, Value, ClockVariables>;
-    QuantitativeTimedPatternMatching<SignalVariables, ClockVariables, Weight, Value> qtpm(TA, initStates, cost);
+    QuantitativeTimedPatternMatching<SignalVariables, ClockVariables, Weight, Value> qtpm(TA, initStates, cost, vm.count("ignore-zero"));
     QTPM(qtpm, file, stdout, vm.count("quiet"), vm.count("abs"));
   } else if (vm.count("maxplus")) {
     using Weight = MaxPlusSemiring<Value>;
     std::function<Weight(const std::vector<Constraint<ClockVariables>> &,const std::vector<std::vector<Value>> &)> cost = multipleSpaceRobustness<Weight, Value, ClockVariables>;
-    QuantitativeTimedPatternMatching<SignalVariables, ClockVariables, Weight, Value> qtpm(TA, initStates, cost);
+    QuantitativeTimedPatternMatching<SignalVariables, ClockVariables, Weight, Value> qtpm(TA, initStates, cost, vm.count("ignore-zero"));
     QTPM(qtpm, file, stdout, vm.count("quiet"), vm.count("abs"));
   } else if (vm.count("boolean")) {
     using Weight = BooleanSemiring;
     std::function<Weight(const std::vector<Constraint<ClockVariables>> &,const std::vector<std::vector<Value>> &)> cost = multipleSpaceRobustness<Weight, Value, ClockVariables>;
-    QuantitativeTimedPatternMatching<SignalVariables, ClockVariables, Weight, Value> qtpm(TA, initStates, cost);
+    QuantitativeTimedPatternMatching<SignalVariables, ClockVariables, Weight, Value> qtpm(TA, initStates, cost, vm.count("ignore-zero"));
     QTPM(qtpm, file, stdout, vm.count("quiet"), vm.count("abs"));
   } else {
     using Weight = MaxMinSemiring<Value>;
     std::function<Weight(const std::vector<Constraint<ClockVariables>> &,const std::vector<std::vector<Value>> &)> cost = multipleSpaceRobustness<Weight, Value, ClockVariables>;
-    QuantitativeTimedPatternMatching<SignalVariables, ClockVariables, Weight, Value> qtpm(TA, initStates, cost);
+    QuantitativeTimedPatternMatching<SignalVariables, ClockVariables, Weight, Value> qtpm(TA, initStates, cost, vm.count("ignore-zero"));
     QTPM(qtpm, file, stdout, vm.count("quiet"), vm.count("abs"));
   }
 
