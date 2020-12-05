@@ -9,7 +9,7 @@ BOOST_AUTO_TEST_CASE( MinPlusSemiringTest0 )
   BOOST_CHECK_EQUAL((MinPlusSemiring<int>(-2) * MinPlusSemiring<int>(2)).data, 0);
   BOOST_CHECK_EQUAL((MinPlusSemiring<int>(-2) + MinPlusSemiring<int>::zero()).data, -2);
   BOOST_CHECK_EQUAL((MinPlusSemiring<int>(-2) * MinPlusSemiring<int>::one()).data, -2);
-  BOOST_CHECK_EQUAL((MinPlusSemiring<int>(-2).star()).data, MinPlusSemiring<int>::one().data);
+  BOOST_CHECK_EQUAL((MinPlusSemiring<int>(-2).star()).data, INT_MIN);
 }
 
 BOOST_AUTO_TEST_CASE( MaxMinSemiringTest0 )

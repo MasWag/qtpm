@@ -6,13 +6,13 @@
 
 BOOST_AUTO_TEST_SUITE(BellmanFordTest)
 
-typedef boost::mpl::list<MinPlusSemiring<int>, MaxMinSemiring<int>> testTypesInt;
+typedef boost::mpl::list<MinPlusSemiring<double>, MaxMinSemiring<int>> testTypesInt;
 
 template<class T>
 struct ans_trait;
 
 template<>
-struct ans_trait<MinPlusSemiring<int>> {
+struct ans_trait<MinPlusSemiring<double>> {
   const static int ans = 2;
 };
 
