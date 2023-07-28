@@ -1,7 +1,7 @@
 digraph G {
-        0 [label="{x0 < 15}"][init=1][match=0];
-        1 [label="{x0 > 5}"][init=0][match=0];
-        2 [init=0][match=1];
-        0->1 [reset="{0}"][guard="{x0 < 5}"];
+        0 [label="{x0 < 15}",init=1,match=0];
+        1 [label="{x0 > 5}",init=0,match=0];
+        2 [init=0,match=1];
+        0->1 [reset="{0}",guard="{x0 < 5}"];
         1->2 [guard="{x0 < 10}"];
 }
