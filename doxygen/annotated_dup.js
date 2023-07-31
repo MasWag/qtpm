@@ -1,0 +1,25 @@
+var annotated_dup =
+[
+    [ "ans_trait", "structans__trait.html", null ],
+    [ "ans_trait< MaxMinSemiring< double > >", "structans__trait_3_01MaxMinSemiring_3_01double_01_4_01_4.html", null ],
+    [ "ans_trait< MaxMinSemiring< int > >", "structans__trait_3_01MaxMinSemiring_3_01int_01_4_01_4.html", null ],
+    [ "ans_trait< MinPlusSemiring< double > >", "structans__trait_3_01MinPlusSemiring_3_01double_01_4_01_4.html", null ],
+    [ "ans_trait< MinPlusSemiring< int > >", "structans__trait_3_01MinPlusSemiring_3_01int_01_4_01_4.html", null ],
+    [ "BooleanSemiring", "classBooleanSemiring.html", "classBooleanSemiring" ],
+    [ "BoostTAState", "structBoostTAState.html", "structBoostTAState" ],
+    [ "BoostTATransition", "structBoostTATransition.html", "structBoostTATransition" ],
+    [ "BoostZoneGraphState", "structBoostZoneGraphState.html", "structBoostZoneGraphState" ],
+    [ "Constraint", "structConstraint.html", "structConstraint" ],
+    [ "ConstraintMaker", "classConstraintMaker.html", "classConstraintMaker" ],
+    [ "DBM", "structDBM.html", "structDBM" ],
+    [ "MaxMinSemiring", "classMaxMinSemiring.html", "classMaxMinSemiring" ],
+    [ "MaxPlusSemiring", "classMaxPlusSemiring.html", "classMaxPlusSemiring" ],
+    [ "MinPlusSemiring", "classMinPlusSemiring.html", "classMinPlusSemiring" ],
+    [ "num_type_trait", "structnum__type__trait.html", "structnum__type__trait" ],
+    [ "num_type_trait< signed char >", "structnum__type__trait_3_01signed_01char_01_4.html", "structnum__type__trait_3_01signed_01char_01_4" ],
+    [ "num_type_trait< unsigned char >", "structnum__type__trait_3_01unsigned_01char_01_4.html", "structnum__type__trait_3_01unsigned_01char_01_4" ],
+    [ "QuantitativeTimedPatternMatching", "classQuantitativeTimedPatternMatching.html", "classQuantitativeTimedPatternMatching" ],
+    [ "ResetVars", "structResetVars.html", "structResetVars" ],
+    [ "weight_label_writer", "structweight__label__writer.html", "structweight__label__writer" ],
+    [ "ZoneGraphLabelWriter", "structZoneGraphLabelWriter.html", "structZoneGraphLabelWriter" ]
+];
