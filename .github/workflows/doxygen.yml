@@ -17,11 +17,13 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: install_dependencies
-      run: sudo apt-get update -y && sudo apt-get install build-essential libeigen3-dev libboost-all-dev cmake doxygen graphviz -y
+      run: sudo apt-get update -y && sudo apt-get install build-essential libeigen3-dev libboost-all-dev cmake doxygen graphviz perl texlive-base texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra -y
     - name: build_doxygen
       run: |
         mkdir -p /tmp/build && cd /tmp/build
         cmake $OLDPWD && make doc
+        make -C /tmp/build/doc/latex/
+        mv /tmp/build/doc/latex/refman.pdf /tmp/build/doc/html/
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
       with:
