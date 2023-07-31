@@ -28,8 +28,8 @@ add_executable(qtpm
   src/main.cc)
 target_link_libraries(qtpm
 #  profiler
- ${Boost_PROGRAM_OPTIONS_LIBRARY}
- ${Boost_GRAPH_LIBRARY})
+${Boost_PROGRAM_OPTIONS_LIBRARY}
+${Boost_GRAPH_LIBRARY})
 
 
 ## Config for Test
@@ -56,7 +56,8 @@ add_test(NAME unit_test
 
 # add a target to generate API documentation with Doxygen
 find_package(Doxygen)
-option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation (requires Doxygen)" ${DOXYGEN_FOUND})
+option(BUILD_DOCUMENTATION "Create the developers manual with Doxygen"
+  ${DOXYGEN_FOUND})
 
 if(BUILD_DOCUMENTATION)
     if(NOT DOXYGEN_FOUND)

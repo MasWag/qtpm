@@ -1,0 +1,33 @@
+name: CmakeLint
+
+on:
+  push:
+    paths:
+      - 'CMakeLists.txt'
+
+jobs:
+  cmake-lint:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Cache pip
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-cmakelint
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install cmakelint
+      run: |
+        python -m pip install cmakelint
+
+    - name: run cmakelint
+      run: |
+        cmakelint ./CMakeLists.txt
