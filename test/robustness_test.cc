@@ -1,4 +1,6 @@
 #include <boost/test/unit_test.hpp>
+#include <boost/mpl/list.hpp>
+
 #include "../src/robustness.hh"
 #include "../src/weighted_graph.hh"
 

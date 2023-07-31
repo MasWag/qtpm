@@ -43,11 +43,23 @@ operator- (Bounds a, const double b) {
 #include <eigen3/Eigen/Core>
 //! @todo configure include directory for eigen
 
+/*!
+ * @brief Implementation of a zone with DBM DBM
+ * For the detail of DBMs, see for example @cite BY03.
+ *
+ * @note Internally, the variable 0 is used for the constant while externally, the actual clock variable is 0 origin, i.e., the variable 0 for the user is the variable 1 internally. So, we need increment or decrement to fill the gap.
+ */
 struct DBM {
   using Tuple = std::tuple<std::vector<Bounds>,Bounds>;
+  //! @brief The matrix representing the DBM
   Eigen::Matrix<Bounds, Eigen::Dynamic, Eigen::Dynamic> value;
+  //! @brief The threshold for the normalization
   Bounds M;
 
+  /*!
+   * @brief Returns the number of the variables represented by this zone
+   * @returns The number of the variables
+   */
   inline std::size_t getNumOfVar() const {
     return value.cols() - 1;
   }
@@ -62,6 +74,8 @@ struct DBM {
     out->M = M;
   }
   
+
+  //! @brief Make the zone of size `size` such that all the values are zero
   static DBM zero(int size) {
     static DBM zeroZone;
     if (zeroZone.value.cols() == size) {
@@ -72,6 +86,8 @@ struct DBM {
     return zeroZone;
   }
 
+
+  //! @brief Return the tuple representation of the DBM.
   std::tuple<std::vector<Bounds>,Bounds> toTuple() const {
     // omit (0,0)
     return std::tuple<std::vector<Bounds>,Bounds>(std::vector<Bounds>(value.data() + 1, value.data() + value.size()),M);
@@ -85,7 +101,7 @@ struct DBM {
     value(x,y) = std::min(value(x, y), c);
   }
 
-  //! @brief add the constraint x - y \le (c,s)
+  //! @brief add the constraint \f$x - y \le (c,s)\f$
   void tighten(uint8_t x, uint8_t y, Bounds c) {
     x++;
     y++;
@@ -130,6 +146,11 @@ struct DBM {
     value(x,0) = infinity;
   }
 
+  /*!
+   * @brief Assign the strongest post-condition of the delay
+   *
+   * @note We do not allow time elapse of duration zero
+   */
   void elapse() {
     // DBM orig = *this;
     static constexpr Bounds infinity = Bounds(std::numeric_limits<double>::infinity(), false);
@@ -142,21 +163,35 @@ struct DBM {
     // }
   }
 
+  /*!
+   * @brief make the zone canonical
+   */
   void canonize() {
     for (int k = 0; k < value.cols(); k++) {
       close1(k);
     }
   }
 
+  /*!
+   * @brief check if the zone is satisfiable
+   *
+   * @pre The zone is canonical
+   */
   inline bool isSatisfiableWithoutCanonize() const {
     return (value + value.transpose()).minCoeff() >= Bounds(0.0, true);
   }
 
+  /*!
+   * @brief check if the zone is satisfiable
+   */
   bool isSatisfiable() {
     canonize();
     return isSatisfiableWithoutCanonize();
   }
 
+  /*!
+   * @brief truncate the constraints compared with a constant greater than or equal to M
+  */
   void abstractize() {
     static constexpr Bounds infinity = Bounds(std::numeric_limits<double>::infinity(), false);
     for (auto it = value.data(); it < value.data() + value.size(); it++) {
@@ -166,6 +201,9 @@ struct DBM {
     }
   }
 
+  /*!
+   * @brief make the zone unsatisfiable
+   */
   void makeUnsat() {
     value(0, 0) = Bounds(-std::numeric_limits<double>::infinity(), false);
   }
@@ -188,32 +226,45 @@ struct DBM {
     return !isSatisfiableWithoutCanonize() || (value.array() <= z.value.array()).all();
   }
 
-  // @pre getNumOfVar() == z.getNumOfVar() == dest.getNumOfVar()
-  //! @brief take convex union
+  /*!
+   * @brief Make the convex union of two DBMs
+   *
+   * The convex union is the smallest DBM containing the given DBMs.
+   *
+   * @param[in] z The DBM to take the convex union
+   * @param[out] dest The DBM to write the resulting convex union
+   *
+   * @pre getNumOfVar() == z.getNumOfVar() == dest.getNumOfVar()
+   */
   void convexUnion(const DBM &z, DBM &dest) const {
     dest.value.array() = value.array().max(z.value.array());
-    // if (isCanonized() && z.isCanonized()) {
-    //   assert(dest.isCanonized());
-    // }
   }
 
   /*!
-    @brief try merging the given DBM to this DBM
-    @retval true when the merging succeeded
-    @retval false when the merging did not succeed
-  */
+   * @brief Try to merge the given DBM to this DBM
+   *
+   * *this is updated to the convex union of *this and z if it is the union of them. This happens if and only if one of them includes the other or two zones are adjacent.
+   *
+   * @param[in] z The DBM to merge
+   * @retval true when the convex union is the union
+   * @retval false when the convex union is not the union
+   */
   bool merge(const DBM &z) {
+    // When *this is included by z
     if (*this <= z) {
       value = std::move(z.value);
       return true;
     }
+    // When z is included by *this
     if (z <= *this) {
       return true;
     }
 
-    // take the convex union
+    // Take the convex union
     DBM convex = DBM::zero(getNumOfVar()+ 1);
     convexUnion(z, convex);
+
+    // Check if convex is the union of *this and z
     const std::size_t N = value.cols();
     for (std::size_t i = 0; i < N; i++) {
       for (std::size_t j = 0; j < N; j++) {
@@ -221,6 +272,7 @@ struct DBM {
         if (i == j) {
           continue;
         }
+        // Exclude the values in *this and check if it is included to z
         const Bounds rev = {-value(j,i).first, !value(j,i).second};
         // When we do not have to tighten, we skip
         if (convex.value(i,j) <= rev) {

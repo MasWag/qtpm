@@ -13,9 +13,19 @@
 
 template<class SignalVariables, class ClockVariables, class Value>
 struct BoostZoneGraphState {
+  //! @brief The corresponding state in the TA
   typename BoostTimedAutomaton<SignalVariables, ClockVariables>::vertex_descriptor vertex;
+  /*!
+   * @brief The flag showing if one can fire a (discrete) transition. This is used to forbid having multiple jumps at the same time
+   * @note In the current implementation, this flag is unnecessary because we have the following:
+   *   @code{.cpp} 
+   *     jumpable == !(valuations.empty())
+   *   @endcode
+   */
   bool jumpable;
+  //! @brief The corresponding zone
   DBM zone;
+  //! @brief The signal valuations observed after the latest (discrete) transition
   std::vector<std::vector<Value>> valuations;
 };
 

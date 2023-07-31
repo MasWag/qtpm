@@ -11,3 +11,5 @@ RECURSIVE              = YES
 USE_MDFILE_AS_MAINPAGE = @doxy_main_page@
 DISABLE_INDEX          = NO
 GENERATE_TREEVIEW      = YES
+CITE_BIB_FILES         = @PROJECT_SOURCE_DIR@/doc/refs.bib
+USE_MATHJAX            = YES
