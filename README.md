@@ -3,7 +3,7 @@ Quantitative Timed Pattern Matching
 
 [![Boost.Test](https://github.com/MasWag/qtpm/actions/workflows/boosttest.yml/badge.svg?branch=master)](https://github.com/MasWag/qtpm/actions/workflows/boosttest.yml)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](./LICENSE)
-![Doxygen](https://img.shields.io/badge/docs-Doxygen-deepgreen.svg)](https://maswag.github.io/qtpm/doxygen/index.html)
+[![Doxygen](https://img.shields.io/badge/docs-Doxygen-deepgreen.svg)](https://maswag.github.io/qtpm/doxygen/index.html)
 
 This is our experimental implementation of *Quantitative Timed Pattern Matching*.
 See [FORMATS2019.md](./experiments/README.md) for the experiments in our FORMATS 2019 paper.
