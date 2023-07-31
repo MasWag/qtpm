@@ -11,8 +11,6 @@ jobs:
       max-parallel: 4
     steps:
     - uses: actions/checkout@v3
-      with:
-        submodules: true
     - name: default build
       run: |
         mkdir -p build
@@ -25,8 +23,6 @@ jobs:
       max-parallel: 4
     steps:
     - uses: actions/checkout@v3
-      with:
-        submodules: true
     - name: set gcc env
       run: |
         export CC=/usr/bin/gcc
@@ -43,8 +39,6 @@ jobs:
       max-parallel: 4
     steps:
     - uses: actions/checkout@v3
-      with:
-        submodules: true
     - name: set clang env
       run: |
         export CC=/usr/bin/clang
@@ -60,8 +54,6 @@ jobs:
       max-parallel: 4
     steps:
     - uses: actions/checkout@v3
-      with:
-        submodules: true
     - name: Install required packages
       run: sudo apt-get update && sudo apt-get install cmake libeigen3-dev libboost-all-dev -y
     - name: build and test
@@ -75,8 +67,6 @@ jobs:
       max-parallel: 4
     steps:
     - uses: actions/checkout@v3
-      with:
-        submodules: true
     - name: Install required packages
       run: sudo apt-get update && sudo apt-get install build-essential cmake libeigen3-dev libboost-all-dev -y
     - name: build and test
@@ -90,8 +80,6 @@ jobs:
       max-parallel: 4
     steps:
     - uses: actions/checkout@v3
-      with:
-        submodules: true
     - name: Install required packages
       run: brew install eigen boost
     - name: build and test
@@ -105,8 +93,6 @@ jobs:
       max-parallel: 4
     steps:
     - uses: actions/checkout@v3
-      with:
-        submodules: true
     - name: Install required packages
       run: brew install eigen boost
     - name: build and test
