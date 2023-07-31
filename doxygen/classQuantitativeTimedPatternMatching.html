@@ -137,7 +137,7 @@ Outline of the Automata-Based Algorithm for Quantitative Timed Pattern Matching<
 <li>A piece \((u_i, \tau_i)\) of the monitored piecewise constant signal is given to <a class="el" href="classQuantitativeTimedPatternMatching.html#a69c30442b09757c7588f3e81adf6330a">feed</a>.</li>
 <li>The configurations corresponding to the matching begging from the current piece are added to the "pool" of the current configurations.</li>
 <li>The zone graph of duration \(\tau_i\) with values \(u_i\) is constructed.</li>
-<li>For each node of the zone graph, we compute the shortest distance to it by the generalized Bellman-Ford algorithm <b>[Mohri09]</b>.</li>
+<li>For each node of the zone graph, we compute the shortest distance to it by the generalized Bellman-Ford algorithm <a class="el" href="citelist.html#CITEREF_Mohri09">[2]</a>.</li>
 <li>By forcing the dwell time, we construct the configuration just after the current piece.</li>
 <li>For the configurations reaching accepting states, we put the resulting matching to this-&gt;result.</li>
 </ol>
