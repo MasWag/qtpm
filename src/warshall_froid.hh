@@ -1,5 +1,7 @@
 #include <unordered_map>
 
+#include <boost/graph/adjacency_list.hpp>
+
 #include "weighted_graph.hh"
 
 /*!

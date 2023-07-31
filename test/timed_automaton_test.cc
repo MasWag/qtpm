@@ -1,4 +1,7 @@
+#include <array>
+
 #include <boost/test/unit_test.hpp>
+
 #include "../src/timed_automaton.hh"
 
 BOOST_AUTO_TEST_SUITE(timedAutomatonParserTests)

@@ -1,8 +1,9 @@
 Quantitative Timed Pattern Matching
 ===================================
 
-[![wercker status](https://app.wercker.com/status/f1121fad1e4e172db519adf0da6d07f4/s/master "wercker status")](https://app.wercker.com/project/byKey/f1121fad1e4e172db519adf0da6d07f4)
+[![Boost.Test](https://github.com/MasWag/qtpm/actions/workflows/boosttest.yml/badge.svg?branch=master)](https://github.com/MasWag/qtpm/actions/workflows/boosttest.yml)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](./LICENSE)
+![Doxygen](https://img.shields.io/badge/docs-Doxygen-deepgreen.svg)](https://maswag.github.io/qtpm/doxygen/index.html)
 
 This is our experimental implementation of *Quantitative Timed Pattern Matching*.
 See [FORMATS2019.md](./experiments/README.md) for the experiments in our FORMATS 2019 paper.
@@ -32,7 +33,7 @@ Usage
 Installation
 ------------
 
-This software is tested on Arch Linux and Mac OSX 10.13.5
+This software is tested on Ubuntu 20.04, Ubuntu 22.04, macOS 11, macOS 12, macOS 13, and Arch Linux.
 
 ### Requirements
 

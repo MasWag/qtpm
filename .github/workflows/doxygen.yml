@@ -1,0 +1,33 @@
+name: Update Doxygen
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '.github/workflows/boosttest.yml'
+      - 'doc/*'
+      - 'examples/*'
+
+jobs:
+  doxygen:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+    - name: install_dependencies
+      run: sudo apt-get update -y && sudo apt-get install build-essential libeigen3-dev libboost-all-dev cmake doxygen graphviz -y
+    - name: build_doxygen
+      run: |
+        mkdir -p /tmp/build && cd /tmp/build
+        cmake $OLDPWD && make doc
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_branch: gh-pages
+        publish_dir: /tmp/build/doc/html
+        destination_dir: doxygen

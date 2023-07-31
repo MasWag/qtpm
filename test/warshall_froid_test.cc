@@ -1,6 +1,9 @@
+#include <array>
 #include <iostream>
+
 #include <boost/test/unit_test.hpp>
 #include <boost/mpl/list.hpp>
+
 #include "../src/warshall_froid.hh"
 
 BOOST_AUTO_TEST_SUITE(WarshallFroidTest)

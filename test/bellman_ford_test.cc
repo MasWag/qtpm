@@ -1,7 +1,10 @@
+#include <array>
 #include <queue>
 #include <iostream>
+
 #include <boost/test/unit_test.hpp>
 #include <boost/mpl/list.hpp>
+
 #include "../src/bellman_ford.hh"
 
 BOOST_AUTO_TEST_SUITE(BellmanFordTest)
