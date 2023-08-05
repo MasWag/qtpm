@@ -8,7 +8,14 @@ set(VERSION_MINOR   1   CACHE STRING "Project minor version number.")
 set(VERSION_PATCH   0   CACHE STRING "Project patch version number.")
 mark_as_advanced(VERSION_MAJOR VERSION_MINOR VERSION_PATCH)
 
-set(CMAKE_CXX_FLAGS "-Wall -std=c++14 -march=native")
+# Add "-march=native" only if it is supported
+include(CheckCXXCompilerFlag)
+check_cxx_compiler_flag("-march=native" COMPILER_SUPPORTS_MARCH_NATIVE)
+if(COMPILER_SUPPORTS_MARCH_NATIVE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+endif()
+
+set(CMAKE_CXX_FLAGS "-Wall -std=c++14")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -pg -O0 -DDEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE "-flto -O3 -DRELEASE")
 
