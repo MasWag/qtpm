@@ -46,7 +46,7 @@ This software is tested on Ubuntu 20.04, Ubuntu 22.04, macOS 11, macOS 12, macOS
 
 ```sh
 mkdir build
-cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && make && make install
+cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && make
 ```
 
 Input Format
