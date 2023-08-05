@@ -157,6 +157,7 @@ std::size_t hash_value(MaxMinSemiring<Base> const& v) {
 class BooleanSemiring {
 public:
   bool data;
+  BooleanSemiring (double value): data(value > 0) {}
   BooleanSemiring (bool data = false): data(data) {}
   BooleanSemiring operator+(const BooleanSemiring& x) const {
     return BooleanSemiring{ data || x.data };
