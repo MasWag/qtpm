@@ -167,6 +167,13 @@ int main(int argc, char *argv[])
   parseBoostTA(taStream, TA, initStates);
 
   FILE* file = timedWordFileName == "stdin" ? stdin : fopen(timedWordFileName.c_str(), "r");
+  // Error handling for file open
+  if (file == nullptr) {
+    perror("Failed to open the input file of the signal");
+    std::cerr << timedWordFileName << std::endl;
+
+    exit(1);
+  }
   using Value = double;
 
   // TODO: branching by semirings
