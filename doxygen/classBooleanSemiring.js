@@ -1,5 +1,6 @@
 var classBooleanSemiring =
 [
+    [ "BooleanSemiring", "classBooleanSemiring.html#abee2bf0bd49fe4d68609fb6a1345092f", null ],
     [ "BooleanSemiring", "classBooleanSemiring.html#a767ebd314eb27ef099577c40ee3ce70f", null ],
     [ "operator!=", "classBooleanSemiring.html#a4213e5d0fc25b59b9c6d4909390d6696", null ],
     [ "operator*", "classBooleanSemiring.html#ae09230a7597517d7f460787a823b133d", null ],

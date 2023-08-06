@@ -252,45 +252,46 @@ $(document).ready(function(){initNavTree('weighted__graph_8hh_source.html',''); 
 <div class="line"><a name="l00157"></a><span class="lineno"><a class="line" href="classBooleanSemiring.html">  157</a></span>&#160;<span class="keyword">class </span><a class="code" href="classBooleanSemiring.html">BooleanSemiring</a> {</div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;<span class="keyword">public</span>:</div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  <span class="keywordtype">bool</span> data;</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a> (<span class="keywordtype">bool</span> data = <span class="keyword">false</span>): data(data) {}</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;  <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a> operator+(<span class="keyword">const</span> <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a>&amp; x)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a>{ data || x.data };</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;  }</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;  <span class="keywordtype">void</span> operator+=(<span class="keyword">const</span> <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a>&amp; x) {</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;     data = data || x.data;</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  }</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;  <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a> operator*(<span class="keyword">const</span> <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a>&amp; x)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a>( data &amp;&amp; x.data);</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;  }</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;  <span class="keywordtype">void</span> operator*=(<span class="keyword">const</span> <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a>&amp; x) {</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    data = data &amp;&amp; x.data;</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;  }</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;  <span class="keywordtype">bool</span> operator!=(<span class="keyword">const</span> <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a>&amp; x)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <span class="keywordflow">return</span> data != x.data;</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;  }</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;  <span class="keywordtype">bool</span> operator==(<span class="keyword">const</span> <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a>&amp; x)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <span class="keywordflow">return</span> data == x.data;</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;  }</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;  <span class="keyword">static</span>  <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a> zero() {</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    <span class="keyword">static</span> <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a> zero = <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a>{ <span class="keyword">false</span> };</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    <span class="keywordflow">return</span> zero;</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;  }</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;  <span class="keyword">static</span> <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a> one() {</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="keyword">static</span> <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a> one = <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a>{ <span class="keyword">true</span> };</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="keywordflow">return</span> one;</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;  }</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;  <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a> star()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    <span class="keywordflow">if</span> (data == <span class="keyword">true</span>) {</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;      <span class="keywordflow">return</span> one();</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;      <span class="keywordflow">return</span> zero();</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    }</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;  }  </div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;};</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160; </div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> std::size_t hash_value(<a class="code" href="classBooleanSemiring.html">BooleanSemiring</a> <span class="keyword">const</span>&amp; v) {</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;  <span class="keywordflow">return</span> boost::hash_value(v.data);</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;}</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a> (<span class="keywordtype">double</span> value): data(value &gt; 0) {}</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;  <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a> (<span class="keywordtype">bool</span> data = <span class="keyword">false</span>): data(data) {}</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;  <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a> operator+(<span class="keyword">const</span> <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a>&amp; x)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a>{ data || x.data };</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;  }</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  <span class="keywordtype">void</span> operator+=(<span class="keyword">const</span> <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a>&amp; x) {</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;     data = data || x.data;</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;  }</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;  <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a> operator*(<span class="keyword">const</span> <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a>&amp; x)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a>( data &amp;&amp; x.data);</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;  }</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;  <span class="keywordtype">void</span> operator*=(<span class="keyword">const</span> <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a>&amp; x) {</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    data = data &amp;&amp; x.data;</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;  }</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;  <span class="keywordtype">bool</span> operator!=(<span class="keyword">const</span> <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a>&amp; x)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <span class="keywordflow">return</span> data != x.data;</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;  }</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;  <span class="keywordtype">bool</span> operator==(<span class="keyword">const</span> <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a>&amp; x)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="keywordflow">return</span> data == x.data;</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;  }</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;  <span class="keyword">static</span>  <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a> zero() {</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    <span class="keyword">static</span> <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a> zero = <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a>{ <span class="keyword">false</span> };</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    <span class="keywordflow">return</span> zero;</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;  }</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;  <span class="keyword">static</span> <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a> one() {</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="keyword">static</span> <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a> one = <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a>{ <span class="keyword">true</span> };</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    <span class="keywordflow">return</span> one;</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;  }</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;  <a class="code" href="classBooleanSemiring.html">BooleanSemiring</a> star()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    <span class="keywordflow">if</span> (data == <span class="keyword">true</span>) {</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;      <span class="keywordflow">return</span> one();</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;      <span class="keywordflow">return</span> zero();</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    }</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;  }  </div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;};</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160; </div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> std::size_t hash_value(<a class="code" href="classBooleanSemiring.html">BooleanSemiring</a> <span class="keyword">const</span>&amp; v) {</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;  <span class="keywordflow">return</span> boost::hash_value(v.data);</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;}</div>
 <div class="ttc" id="aclassBooleanSemiring_html"><div class="ttname"><a href="classBooleanSemiring.html">BooleanSemiring</a></div><div class="ttdef"><b>Definition:</b> weighted_graph.hh:157</div></div>
 <div class="ttc" id="aclassMaxMinSemiring_html"><div class="ttname"><a href="classMaxMinSemiring.html">MaxMinSemiring</a></div><div class="ttdef"><b>Definition:</b> weighted_graph.hh:107</div></div>
 <div class="ttc" id="aclassMaxPlusSemiring_html"><div class="ttname"><a href="classMaxPlusSemiring.html">MaxPlusSemiring</a></div><div class="ttdef"><b>Definition:</b> weighted_graph.hh:58</div></div>
